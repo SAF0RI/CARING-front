@@ -14,21 +14,21 @@ export class ProcessManager {
     this.processes = processes;
   }
 
-  public async execute() {
-    new Promise((resolve, reject) => {
-      this.processes.forEach(async (process) => {
-        try {
-          const result = await process();
-          if (result.success) {
-            resolve(void 0);
-          } else {
-            reject(result.error);
-          }
-        } catch (error) {
-          reject(error);
+  public async execute(): Promise<void> {
+    for (const process of this.processes) {
+      try {
+        const result = await process();
+
+        if (!result.success) {
+          throw result.error ?? new Error("Process failed without error info");
         }
-      });
-      resolve(void 0);
-    });
+      } catch (err) {
+        // 중단
+        throw err;
+      }
+    }
+
+    // 모두 성공 시 반환
+    return;
   }
 }
