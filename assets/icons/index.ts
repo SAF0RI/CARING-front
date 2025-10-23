@@ -122,3 +122,26 @@ export { default as TrashWhite } from "./ic_trash_white.svg";
 // wifi icon
 export { default as Wifi } from "./ic_wifi.svg";
 export { default as WifiOffAlert } from "./ic_wifi_off_alert.svg";
+
+// audio icon
+export { default as Mic } from "./audio/ic_mic.svg";
+export { default as Pause } from "./audio/ic_pause.svg";
+export { default as Play } from "./audio/ic_play.svg";
+export { default as Stop } from "./audio/ic_stop.svg";
+
+// emotion icon
+export { default as anxiety } from "./emotion/ic_anxiety.svg";
+export { default as anxietyBig } from "./emotion/ic_anxiety_big.svg";
+export { default as calm } from "./emotion/ic_calm.svg";
+export { default as calmBig } from "./emotion/ic_calm_big.svg";
+export { default as happy } from "./emotion/ic_happy.svg";
+export { default as happyBig } from "./emotion/ic_happy_big.svg";
+export { default as sad } from "./emotion/ic_sad.svg";
+export { default as sadBig } from "./emotion/ic_sad_big.svg";
+
+// footer icon
+export { default as FooterLogo } from "./footer/ic_logo_footer.svg";
+
+// header icon
+export { default as HeaderQuestionIcon } from "./header/ic_ques.svg";
+export { default as HeaderLogo } from "./header/logo_header.svg";
