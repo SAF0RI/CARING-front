@@ -36,6 +36,7 @@ export default function TabsLayout() {
                     ),
                 }}
             />
+            {/* 주석 예정 */}
             <Tabs.Screen
                 name="demo"
                 options={{

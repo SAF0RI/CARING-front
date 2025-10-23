@@ -1,5 +1,6 @@
 import { useAuthStore } from "@/shared/model/store/authStore";
 import { Button } from "@/shared/ui/buttons";
+import { Footer } from "@/shared/ui/footer";
 import { AlertHeader } from "@/shared/ui/header";
 import { MainLayout } from "@/shared/ui/layout";
 import { Text } from "react-native";
@@ -22,6 +23,7 @@ export default function DemoScreen() {
                     <Text className="text-primary">로그아웃</Text>
                 </Button>
             </MainLayout.Content>
+            <Footer />
         </MainLayout>
     );
 }
