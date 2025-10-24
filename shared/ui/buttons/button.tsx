@@ -1,3 +1,4 @@
+import { Icon } from "@/shared/ui/svg";
 import { cn } from "@/shared/util/style";
 import * as React from "react";
 import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
@@ -10,6 +11,7 @@ export type ButtonProps = {
     className?: string;
     layoutClassName?: string;
     innerClassName?: string;
+    hasArrow?: boolean;
 } & TouchableOpacityProps;
 
 
@@ -21,6 +23,7 @@ export const Button = ({
     className,
     layoutClassName,
     innerClassName,
+    hasArrow = false,
     ...props
 }: ButtonProps) => {
     const sizeClass = size === "lg" ? "mx-6 py-4" : "mx-4 py-3";
@@ -30,13 +33,13 @@ export const Button = ({
 
 
     const palette = {
-        bg: variant === "filled" ? "bg-primary" : "bg-transparent",
-        border: variant === "outlined" ? "border border-primary" : "",
+        bg: variant === "filled" ? "bg-main800" : "bg-transparent",
+        border: variant === "outlined" ? "border border-main800" : "",
         text: variant === "filled" ? "text-white" : "text-primary",
     };
 
     const containerClasses = cn([
-        "rounded-md", variant === "text" ? "" : sizeClass, palette.bg, palette.border, layoutClass, className ?? "", innerClassName ?? "",
+        "rounded-xl", variant === "text" ? "" : sizeClass, palette.bg, palette.border, layoutClass, className ?? "", innerClassName ?? "",
     ]
         .filter(Boolean)
     );
@@ -44,7 +47,9 @@ export const Button = ({
     return (
         <View className={cn(["w-full", layoutClassName ?? ""])}>
             <TouchableOpacity className={containerClasses} {...props}>
-                <View className={cn(["font-semibold", textSizeClass, palette.text, innerClassName ?? ""])}>{children}</View>
+                <View className={cn(["font-semibold", textSizeClass, palette.text, innerClassName ?? "", hasArrow ? "flex-row items-center justify-center gap-x-1" : ""])}>{children}
+                    {hasArrow && <Icon name={variant === "filled" ? "ChevronRightWhite" : "ChevronRightBlack"} />}
+                </View>
             </TouchableOpacity>
         </View>
     );

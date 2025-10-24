@@ -92,6 +92,15 @@ module.exports = {
         disabled: "#D8D8D8",
 
         white: "#FFFFFF",
+
+        anxietyBg: "#FDE6E6",
+        anxietyText: "#640000",
+        calmBg: "#EBFAEB",
+        calmText: "#249224",
+        happyBg: "#FFF5EA",
+        happyText: "#B26E20",
+        sadBg: "#EAF0F7",
+        sadText: "#152C4A",
       },
       fontSize: {
         sm: "13px",
