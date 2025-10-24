@@ -6,7 +6,7 @@ import { TouchableOpacity, TouchableOpacityProps, View } from "react-native";
 export type ButtonProps = {
     children: React.ReactNode;
     variant?: "filled" | "outlined" | "text";
-    color?: "primary";
+    color?: "primary" | "main";
     size?: "md" | "lg";
     className?: string;
     layoutClassName?: string;

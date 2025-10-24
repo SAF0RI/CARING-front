@@ -1,3 +1,4 @@
+export * from "./audio-control-button";
 export * from "./button";
 export * from "./call-for-help-button";
 export * from "./help-button";

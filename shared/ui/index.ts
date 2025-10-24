@@ -1,5 +1,6 @@
 export * from "./audio";
 export * from "./buttons";
+export * from "./components";
 export * from "./footer";
 export * from "./header";
 export * from "./input";
