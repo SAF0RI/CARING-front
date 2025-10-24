@@ -91,7 +91,7 @@ export default function DiaryListScreen() {
                 />
             </MainLayout.Header>
 
-            <MainLayout.Content className="bg-gray5 flex-1 p-0">
+            <MainLayout.Content className="bg-gray5 flex-1 p-0" footer={false}>
                 {isLoading ? (
                     <View className="flex-1 justify-center items-center">
                         <ActivityIndicator size="large" color="#6366f1" />

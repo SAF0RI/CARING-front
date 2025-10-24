@@ -1,6 +1,6 @@
 import { useAudioPlayer } from "@/shared/lib/hooks/useAudioPlayer";
 import { Diary, } from "@/shared/type";
-import { AudioControlButton, AudioProgress, BackHeader, Button, EmotionComponent, Footer, HelpButton, Icon, MainLayout } from "@/shared/ui";
+import { AudioControlButton, AudioProgress, BackHeader, Button, EmotionComponent, HelpButton, Icon, MainLayout } from "@/shared/ui";
 import { formatDate } from "@/shared/util/format";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -145,7 +145,6 @@ export default function DiaryDetailScreen() {
                     </View>
                 </View>
             </Modal>
-            <Footer />
         </MainLayout >
     );
 }
