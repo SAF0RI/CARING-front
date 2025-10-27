@@ -119,6 +119,7 @@ export default function DiaryListScreen() {
                                 <Text className="text-white font-bold text-[17px]">분석 결과 보기</Text>
                             </Button>
                         </View>}
+                        contentContainerStyle={{ flexGrow: 1 }}
                         contentContainerClassName="gap-y-4"
                         showsVerticalScrollIndicator={false}
                         scrollEnabled

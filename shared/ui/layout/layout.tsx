@@ -19,7 +19,7 @@ export const MainLayout = ({ children, className, ...props }: LayoutProps) => {
 export const LayoutContent = ({ children, className, footer = true, ...props }: LayoutProps) => {
     return (
         <>
-            <View className={cn("w-full py-8 px-4", className)} {...props}>
+            <View className={cn("w-full py-8 px-4 flex-1", className)} {...props}>
                 {children}
             </View>
             {footer && <Footer />}
