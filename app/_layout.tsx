@@ -2,6 +2,7 @@ import { FcmProvider } from '@/shared/lib/fcm';
 import { useAuthStore } from "@/shared/model/store/authStore";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Redirect, Slot, useRootNavigationState, useSegments } from "expo-router";
+import "../index.css";
 
 export default function RootLayout() {
 
