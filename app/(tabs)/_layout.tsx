@@ -10,11 +10,11 @@ export default function TabsLayout() {
         }}
         >
             <Tabs.Screen
-                name="home"
+                name="diary-list"
                 options={{
-                    title: "홈",
+                    title: "일기 리스트",
                     tabBarIcon: ({ focused }) => (
-                        <Icon name={focused ? "HomeActive" : "HomeDisabled"} width={24} height={24} />
+                        <Icon name={focused ? "ListActive" : "ListDisabled"} size={24} />
                     ),
                 }}
             />
@@ -23,7 +23,7 @@ export default function TabsLayout() {
                 options={{
                     title: "마음 일기",
                     tabBarIcon: ({ focused }) => (
-                        <Icon name={focused ? "NoteActive" : "NoteDisabled"} width={24} height={24} />
+                        <Icon name={focused ? "NoteActive" : "NoteDisabled"} size={24} />
                     ),
                 }}
             />
@@ -32,16 +32,17 @@ export default function TabsLayout() {
                 options={{
                     title: "내 정보",
                     tabBarIcon: ({ focused }) => (
-                        <Icon name={focused ? "AccountActive" : "AccountDisabled"} width={24} height={24} />
+                        <Icon name={focused ? "AccountActive" : "AccountDisabled"} size={24} />
                     ),
                 }}
             />
+            {/* 주석 예정 */}
             <Tabs.Screen
                 name="demo"
                 options={{
                     title: "데모",
                     tabBarIcon: ({ focused }) => (
-                        <Icon name={focused ? "AccountActive" : "AccountDisabled"} width={24} height={24} />
+                        <Icon name={focused ? "AccountActive" : "AccountDisabled"} size={24} />
                     ),
                 }}
             />

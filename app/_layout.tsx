@@ -1,6 +1,8 @@
 import { FcmProvider } from '@/shared/lib/fcm';
 import { useAuthStore } from "@/shared/model/store/authStore";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Redirect, Slot, useRootNavigationState, useSegments } from "expo-router";
+import "../index.css";
 
 export default function RootLayout() {
 
@@ -15,10 +17,15 @@ export default function RootLayout() {
     return <Redirect href="/(auth)/login" />;
   }
   if (isAuthenticated && inAuthGroup) {
-    return <Redirect href="/(tabs)/home" />;
+    return <Redirect href="/(tabs)/diary-list" />;
   }
+  const queryClient = new QueryClient();
 
-  return <FcmProvider>
-    <Slot />
-  </FcmProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <FcmProvider>
+        <Slot />
+      </FcmProvider>
+    </QueryClientProvider >
+  );
 }

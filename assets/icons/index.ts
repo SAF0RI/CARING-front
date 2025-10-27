@@ -30,6 +30,7 @@ export { default as BatteryAlert } from "./ic_battery_alert.svg";
 
 // bell icon
 export { default as Bell } from "./ic_bell.svg";
+export { default as BellAlert } from "./ic_bell_alert_active.svg";
 
 // chat icon
 export { default as Chat } from "./ic_chat_message.svg";
@@ -47,6 +48,7 @@ export { default as ChevronDown } from "./ic_chevron_down.svg";
 export { default as ChevronRightBlack } from "./ic_chevron_right_black.svg";
 export { default as ChevronRightBlue } from "./ic_chevron_right_blue.svg";
 export { default as ChevronRightGray } from "./ic_chevron_right_gray.svg";
+export { default as ChevronRightWhite } from "./ic_chevron_right_white.svg";
 
 // close icon
 export { default as Close } from "./ic_close.svg";
@@ -78,6 +80,10 @@ export { default as HouseHeart } from "./ic_house_heart.svg";
 // lock icon
 export { default as Lock } from "./ic_lock.svg";
 export { default as LockFilled } from "./ic_lock_filled.svg";
+
+//list icon
+export { default as ListActive } from "./ic_list_active.svg";
+export { default as ListDisabled } from "./ic_list_disabled.svg";
 
 //note icon
 export { default as NoteActive } from "./ic_note_active.svg";
@@ -130,14 +136,14 @@ export { default as Play } from "./audio/ic_play.svg";
 export { default as Stop } from "./audio/ic_stop.svg";
 
 // emotion icon
-export { default as anxiety } from "./emotion/ic_anxiety.svg";
-export { default as anxietyBig } from "./emotion/ic_anxiety_big.svg";
-export { default as calm } from "./emotion/ic_calm.svg";
-export { default as calmBig } from "./emotion/ic_calm_big.svg";
-export { default as happy } from "./emotion/ic_happy.svg";
-export { default as happyBig } from "./emotion/ic_happy_big.svg";
-export { default as sad } from "./emotion/ic_sad.svg";
-export { default as sadBig } from "./emotion/ic_sad_big.svg";
+export { default as anxiety } from "./emotions/ic_anxiety.svg";
+export { default as anxietyBig } from "./emotions/ic_anxiety_big.svg";
+export { default as calm } from "./emotions/ic_calm.svg";
+export { default as calmBig } from "./emotions/ic_calm_big.svg";
+export { default as happy } from "./emotions/ic_happy.svg";
+export { default as happyBig } from "./emotions/ic_happy_big.svg";
+export { default as sad } from "./emotions/ic_sad.svg";
+export { default as sadBig } from "./emotions/ic_sad_big.svg";
 
 // footer icon
 export { default as FooterLogo } from "./footer/ic_logo_footer.svg";
