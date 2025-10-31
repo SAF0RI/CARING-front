@@ -1,25 +1,55 @@
+import type { UserInfo } from "@/entities/user/api/schema";
+import { getLocalUserInfo } from "@/entities/user/api/storage";
 import { FcmProvider } from '@/shared/lib/fcm';
-import { useAuthStore } from "@/shared/model/store/authStore";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Redirect, Slot, useRootNavigationState, useSegments } from "expo-router";
+import { useEffect, useState } from 'react';
 import "../index.css";
 
 export default function RootLayout() {
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
 
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const segments = useSegments();
   const navigationState = useRootNavigationState();
 
-  if (!navigationState?.key) return null;
-
   const inAuthGroup = segments[0] === "(auth)";
-  if (!isAuthenticated && !inAuthGroup) {
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const info = await getLocalUserInfo();
+        setUserInfo(info);
+      } finally {
+        setIsLoadingUser(false);
+      }
+    })();
+  }, []);
+
+  if (!navigationState?.key) return null;
+  if (isLoadingUser) return null;
+
+  if (!userInfo && !inAuthGroup) {
     return <Redirect href="/(auth)/login" />;
   }
-  if (isAuthenticated && inAuthGroup) {
+  if (userInfo && inAuthGroup) {
     return <Redirect href="/(tabs)/diary-list" />;
   }
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      mutations: {
+        onMutate: (variables) => {
+          console.log("[RQ][Mutation][Request]", variables);
+        },
+        onSuccess: (data, variables) => {
+          console.log("[RQ][Mutation][Response]", { data, variables });
+        },
+        onError: (error, variables) => {
+          console.log("[RQ][Mutation][Error]", { error, variables });
+        },
+      },
+    },
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
