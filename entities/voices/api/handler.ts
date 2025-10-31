@@ -8,9 +8,9 @@ import {
   UploadVoiceRequest,
   UploadVoiceResponse,
   UploadVoiceWithQuestionRequest,
-  VoiceQuestionUploadResponse,
-  UserVoiceListResponse,
   UserVoiceDetailResponse,
+  UserVoiceListResponse,
+  VoiceQuestionUploadResponse,
 } from "./schema";
 
 export const uploadVoice = async ({
@@ -41,7 +41,6 @@ export const uploadVoice = async ({
   return response.data;
 };
 
-// POST /users/voices (multipart) with question_id and optional username in query
 export const uploadVoiceWithQuestion = async ({
   file,
   question_id,

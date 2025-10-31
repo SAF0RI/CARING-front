@@ -5,6 +5,8 @@ export interface RNFileParam {
   name: string;
 }
 
+export type Emotion = "unknown" | "anxiety" | "calm" | "happy" | "sad";
+
 // Upload voice with question (multipart/form-data + optional username query)
 export interface UploadVoiceWithQuestionRequest {
   file: RNFileParam;
@@ -23,7 +25,7 @@ export interface VoiceQuestionUploadResponse {
 export interface VoiceListItem {
   voice_id: number;
   created_at: string;
-  emotion?: string | null;
+  emotion?: Emotion | null;
   question_title?: string | null;
   content: string;
 }
@@ -37,7 +39,7 @@ export interface UserVoiceListResponse {
 export interface UserVoiceDetailResponse {
   voice_id: number;
   title?: string | null;
-  top_emotion?: string | null;
+  top_emotion?: Emotion | null;
   created_at: string;
   voice_content?: string | null;
 }

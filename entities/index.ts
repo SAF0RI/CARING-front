@@ -1,13 +1,13 @@
 import { mergeQueryKeys } from "@lukemorales/query-key-factory";
 
-import { userQueries } from "./user/api";
-import { voicesQueries } from "./voices/api";
-import { careQueries } from "./care/api";
 import { adminQueries } from "./admin/api";
+import { careQueries } from "./care/api";
 import { nlpQueries } from "./nlp/api";
 import { questionsQueries } from "./questions/api";
 import { systemQueries } from "./system/api";
 import { testQueries } from "./test/api";
+import { userQueries } from "./user/api";
+import { voicesQueries } from "./voices/api";
 
 export const queries = mergeQueryKeys(
   userQueries,
@@ -15,8 +15,7 @@ export const queries = mergeQueryKeys(
   careQueries,
   adminQueries,
   nlpQueries,
-  questionsQueries
-  ,
+  questionsQueries,
   systemQueries,
   testQueries
 );

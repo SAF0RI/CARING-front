@@ -8,5 +8,5 @@ export type Diary = {
   title: string;
   content?: string;
   serverId?: string;
-  emotion: "anxiety" | "calm" | "happy" | "sad";
+  emotion: "unknown" | "anxiety" | "calm" | "happy" | "sad";
 };

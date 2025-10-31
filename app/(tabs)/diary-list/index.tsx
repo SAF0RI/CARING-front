@@ -1,15 +1,15 @@
 import { useAudioPlayer } from "@/shared/lib/hooks/useAudioPlayer";
-import { Diary } from "@/shared/type";
 import { AudioControlButton, Button, EmotionComponent, Footer, HelpButton, MainHeader, MainLayout } from "@/shared/ui";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { queries } from "@/entities";
+import { VoiceListItem } from "@/entities/voices/api/schema";
 import { formatDate } from "@/shared/util/format";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 
 type DiaryListCardProps = {
-    diary: Diary;
+    diary: VoiceListItem;
     isPlaying: boolean;
     isBuffering?: boolean;
     onPress: () => void;
@@ -20,15 +20,15 @@ const DiaryListCard = ({ diary, isPlaying, isBuffering = false, onPress }: Diary
     return (
         <TouchableOpacity
             className={`rounded-[20px] p-4 gap-y-2 bg-gray1 mx-4`}
-            onPress={() => router.push(`/diary-list/${diary.id}`)}
+            onPress={() => router.push(`/diary-list/${diary.voice_id}`)}
         >
             <View className="bg-gray10 rounded-full px-4 py-1 w-fit self-start">
-                <Text className="text-gray90 text-[15px] font-semibold">{formatDate(diary.createdAt)}</Text>
+                <Text className="text-gray90 text-[15px] font-semibold">{formatDate(diary.created_at)}</Text>
             </View>
             <View className="self-start">
-                <EmotionComponent emotion={diary.emotion} isBig={false} />
+                <EmotionComponent emotion={diary.emotion ?? 'unknown'} isBig={false} />
             </View>
-            <Text className="text-main900 text-[15px] font-semibold mb-1 px-1">{diary?.title ?? '오늘 주변에서 본 것 중 가장 보기 좋았던 풍경은 무엇인가요?'}</Text>
+            <Text className="text-main900 text-[15px] font-semibold mb-1 px-1">{diary?.question_title ?? '오늘 주변에서 본 것 중 가장 보기 좋았던 풍경은 무엇인가요?'}</Text>
             <Text
                 className="text-gray70 text-[13px] px-1"
                 numberOfLines={2}
@@ -47,40 +47,40 @@ const DiaryListCard = ({ diary, isPlaying, isBuffering = false, onPress }: Diary
 };
 
 export default function DiaryListScreen() {
+
+    const { data: userInfo } = useQuery(queries.user.userInfo);
+
     const { data: diaries, refetch, isLoading } = useQuery({
-        queryKey: ['diaryList'],
-        queryFn: async () => await AsyncStorage.getItem('diaries'),
-        select: (data: string | null) => data ? JSON.parse(data) : []
+        ...queries.voices.userVoiceList(userInfo?.username ?? ''),
+        enabled: !!userInfo?.username,
     });
 
     const { playAudio, isPlaying, isBuffering } = useAudioPlayer();
 
     const handleCardPress = async (diaryId: string) => {
-        const diary = diaries?.find((d: Diary) => d.id === diaryId);
+        const diary = diaries?.voices?.find((d: VoiceListItem) => d.voice_id === Number(diaryId));
         if (diary) {
-            const audioUri = diary.serverUrl || diary.fileUri;
-            if (audioUri) {
-                await playAudio(diaryId, audioUri);
-            }
+            // const audioUri = diary.serverUrl || diary.fileUri;
+            // if (audioUri) {
+            //     await playAudio(diaryId, audioUri);
+            // }
         }
     };
 
 
-    const renderDiaryCard = ({ item }: { item: Diary }) => {
-        const isCurrentlyPlaying = isPlaying(item.id);
-        const isCurrentlyBuffering = isBuffering(item.id);
+    const renderDiaryCard = ({ item }: { item: VoiceListItem }) => {
+        const isCurrentlyPlaying = isPlaying(item.voice_id.toString());
+        const isCurrentlyBuffering = isBuffering(item.voice_id.toString());
 
         return (
             <DiaryListCard
                 diary={item}
                 isPlaying={isCurrentlyPlaying}
                 isBuffering={isCurrentlyBuffering}
-                onPress={() => handleCardPress(item.id)}
+                onPress={() => handleCardPress(item.voice_id.toString())}
             />
         );
     };
-
-    console.log(diaries);
 
     return (
         <MainLayout>
@@ -99,11 +99,11 @@ export default function DiaryListScreen() {
                     </View>
                 ) : (
                     <FlatList
-                        data={diaries}
+                        data={diaries?.voices ?? []}
                         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => { refetch() }} />}
                         renderItem={renderDiaryCard}
                         ItemSeparatorComponent={() => <View className="h-5" />}
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item) => item.voice_id.toString()}
                         ListHeaderComponent={() => <View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px]">
                             <Text className="text-gray90 text-[15px]">나를 더 알아가는 시간</Text>
                             <Text className="text-xl font-bold">

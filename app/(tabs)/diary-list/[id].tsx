@@ -1,22 +1,22 @@
+import { queries } from "@/entities";
+import { deleteUserVoice } from "@/entities/voices/api/handler";
 import { useAudioPlayer } from "@/shared/lib/hooks/useAudioPlayer";
-import { Diary, } from "@/shared/type";
 import { AudioControlButton, AudioProgress, BackHeader, Button, EmotionComponent, HelpButton, Icon, MainLayout } from "@/shared/ui";
 import { formatDate } from "@/shared/util/format";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Alert, Modal, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Modal, Text, TouchableOpacity, View } from "react-native";
 
 export default function DiaryDetailScreen() {
 
     const { id } = useLocalSearchParams();
 
+    const { data: userInfo } = useQuery(queries.user.userInfo);
+
     const { data: diary } = useQuery({
-        queryKey: ['diary', id],
-        queryFn: async () => await AsyncStorage.getItem('diaries'),
-        select: (data: string | null) => data ? JSON.parse(data) : [],
-        enabled: !!id
+        ...queries.voices.userVoiceDetail(Number(id), userInfo?.username ?? ''),
+        enabled: !!id && !!userInfo?.username,
     });
 
     // if (!diary) {
@@ -24,37 +24,37 @@ export default function DiaryDetailScreen() {
     //     return <Redirect href="/diary-list" />;
     // }
 
-    const currentDiary = diary?.find((diary: Diary) => diary.id === id);
+    const currentDiary = diary?.voice_id === Number(id) ? diary : null;
     const { playAudio, isPlaying, isBuffering, player, status } = useAudioPlayer({});
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const handlePlayPress = async () => {
-        if (currentDiary) {
-            const audioUri = currentDiary.serverUrl || currentDiary.fileUri;
-            if (audioUri) {
-                await playAudio(currentDiary.id, audioUri);
-            }
-        }
-    };
+    // const handlePlayPress = async () => {
+    //     if (currentDiary) {
+    //         const audioUri = currentDiary.serverUrl || currentDiary.fileUri;
+    //         if (audioUri) {
+    //             await playAudio(currentDiary.id, audioUri);
+    //         }
+    //     }
+    // };
 
-    const handleDeletePress = async () => {
-        const diaries = JSON.parse(await AsyncStorage.getItem('diaries') || '[]');
-        const newDiaries = diaries?.filter((diary: Diary) => diary.id !== currentDiary?.id);
-        await AsyncStorage.setItem('diaries', JSON.stringify(newDiaries));
-    }
+    // const handleDeletePress = async () => {
+    //     const diaries = JSON.parse(await AsyncStorage.getItem('diaries') || '[]');
+    //     const newDiaries = diaries?.voices?.filter((diary: VoiceListItem) => diary.voice_id !== currentDiary?.voice_id);
+    //     await AsyncStorage.setItem('diaries', JSON.stringify(newDiaries));
+    // }
 
     const queryClient = useQueryClient();
 
-    const { mutate: deleteDiary } = useMutation({
-        mutationFn: handleDeletePress,
-        onError: (error) => {
+    const { mutate: deleteDiary, isPending: isDeleting } = useMutation({
+        mutationFn: () => deleteUserVoice(Number(id), userInfo?.username ?? ''),
+        onError: () => {
             Alert.alert('오류', '일기 삭제 중 오류가 발생했습니다.');
         },
         onSettled: () => {
             setIsModalVisible(false);
             router.replace('/diary-list');
-            queryClient.invalidateQueries({ queryKey: ['diaryList'] });
+            queryClient.invalidateQueries(queries.voices.userVoiceList(userInfo?.username ?? ''));
         }
     });
 
@@ -66,19 +66,18 @@ export default function DiaryDetailScreen() {
 
             <MainLayout.Content className="bg-gray5 flex-1 p-4">
                 <View className="bg-white rounded-[20px] p-6 gap-y-4">
-                    <Text>{currentDiary?.id}</Text>
                     <Text className="text-gray90 text-[15px] font-semibold w-full text-center">
                         {formatDate(new Date().toISOString())}
                     </Text>
                     <EmotionComponent
                         className="self-center"
-                        emotion={currentDiary?.emotion ?? 'calm'} isBig={false} showAiAnalysisText={true} />
+                        emotion={currentDiary?.top_emotion ?? 'unknown'} isBig={false} showAiAnalysisText={true} />
                     <Text className="text-main900 text-[19px] font-bold">
                         {currentDiary?.title ?? '오늘 주변에서 본 것 중 가장 보기 좋았던 풍경은 무엇인가요?'}
                     </Text>
 
                     <Text className="text-black text-[17px] leading-6">
-                        {currentDiary?.content ?? '창밖을 보니 길가에 심어놓은 국화꽃이 활짝 피었더라. 노랗고 하얀 꽃들이 옹기종기 모여 있는 모습이 참 예뻤다. 가을이 깊어가는구나 싶어 마음이 차분해졌다.'}
+                        {currentDiary?.voice_content ?? '아직 기록이 완성되지 않았습니다.'}
                     </Text>
                     {/* audio control component : 사진 참고 */}
                     <AudioProgress
@@ -86,9 +85,9 @@ export default function DiaryDetailScreen() {
                         status={status}
                     />
                     <AudioControlButton
-                        isPlaying={isPlaying(currentDiary?.id || '')}
-                        isBuffering={isBuffering(currentDiary?.id || '')}
-                        onPress={handlePlayPress}
+                        isPlaying={isPlaying(currentDiary?.voice_id.toString() || '')}
+                        isBuffering={isBuffering(currentDiary?.voice_id.toString() || '')}
+                        onPress={() => { }}
                     />
                     <View className="self-end">
                         <Button variant="text" color="primary" onPress={() => setIsModalVisible(true)}>
@@ -129,6 +128,7 @@ export default function DiaryDetailScreen() {
                                 onPress={() => setIsModalVisible(false)}
                                 layoutClassName="flex-1 m-0"
                                 className="m-0 bg-gray80"
+                                disabled={isDeleting}
                             >
                                 <Text className="text-white text-[15px] font-semibold">취소</Text>
                             </Button>
@@ -138,8 +138,9 @@ export default function DiaryDetailScreen() {
                                 layoutClassName="flex-1 m-0"
                                 className="m-0 bg-red700"
                                 onPress={() => deleteDiary()}
+                                disabled={isDeleting}
                             >
-                                <Text className="text-white text-[15px] font-semibold">삭제</Text>
+                                <Text className="text-white text-[15px] font-semibold">{isDeleting ? <ActivityIndicator size="small" color="white" /> : '삭제'}</Text>
                             </Button>
                         </View>
                     </View>

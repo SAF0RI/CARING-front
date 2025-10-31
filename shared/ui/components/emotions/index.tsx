@@ -1,10 +1,13 @@
+import { Emotion } from "@/entities/voices/api/schema";
 import { Diary } from "@/shared/type";
 import { cn } from "@/shared/util/style";
 import { Text, View } from "react-native";
 import { Icon } from "../../svg";
 
-export const EmotionIconComponent = ({ emotion, isBig }: { emotion: Diary['emotion'], isBig: boolean }) => {
+export const EmotionIconComponent = ({ emotion, isBig }: { emotion: Emotion, isBig: boolean }) => {
     switch (emotion) {
+        case "unknown":
+            return <Icon name="Spinner" size={isBig ? 40 : 20} />;
         case "anxiety":
             return <Icon name={isBig ? "anxietyBig" : "anxiety"} size={isBig ? 40 : 20} />;
         case "calm":
@@ -26,26 +29,29 @@ export const EmotionComponent = ({
     className,
 }: {
     showAiAnalysisText?: boolean;
-    emotion?: Diary['emotion'],
+    emotion?: Emotion,
     isBig?: boolean;
     className?: string;
 }) => {
     const bgColorMap = {
+        unknown: 'bg-gray10',
         anxiety: 'bg-anxietyBg',
         calm: 'bg-calmBg',
         happy: 'bg-happyBg',
         sad: 'bg-sadBg',
     }
     const textColorMap = {
+        unknown: 'text-gray90',
         anxiety: 'text-anxietyText',
         calm: 'text-calmText',
         happy: 'text-happyText',
         sad: 'text-sadText',
     }
-    const bgColor = bgColorMap[emotion];
-    const textColor = textColorMap[emotion];
+    const bgColor = bgColorMap[emotion] ?? bgColorMap['unknown'];
+    const textColor = textColorMap[emotion] ?? textColorMap['unknown'];
 
     const emotionText: Record<Diary['emotion'], string> = {
+        unknown: '분석 중',
         anxiety: '불안',
         calm: '평온',
         happy: '즐거움',
@@ -56,7 +62,7 @@ export const EmotionComponent = ({
         <View className={cn([`rounded-full`, bgColor, 'flex-row items-center justify-center px-3 py-1 gap-x-1', className])}>
             {showAiAnalysisText && <Text className="text-gray90 text-[15px] font-semibold">{'AI 분석 : '}</Text>}
             <EmotionIconComponent emotion={emotion} isBig={isBig} />
-            <Text className={cn([textColor, 'text-[15px] font-semibold'])}>{emotionText[emotion]}</Text>
+            <Text className={cn([textColor, 'text-[15px] font-semibold'])}>{emotionText[emotion ?? 'unknown']}</Text>
         </View>
     );
 };
