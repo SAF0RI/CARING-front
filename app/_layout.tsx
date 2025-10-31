@@ -37,6 +37,9 @@ export default function RootLayout() {
   }
   const queryClient = new QueryClient({
     defaultOptions: {
+      queries: {
+        retry: false,
+      },
       mutations: {
         onMutate: (variables) => {
           console.log("[RQ][Mutation][Request]", variables);

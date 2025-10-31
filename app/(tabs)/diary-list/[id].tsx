@@ -19,6 +19,7 @@ export default function DiaryDetailScreen() {
         enabled: !!id && !!userInfo?.username,
     });
 
+
     // if (!diary) {
     //     Alert.alert('일기를 찾을 수 없습니다.');
     //     return <Redirect href="/diary-list" />;
@@ -67,7 +68,7 @@ export default function DiaryDetailScreen() {
             <MainLayout.Content className="bg-gray5 flex-1 p-4">
                 <View className="bg-white rounded-[20px] p-6 gap-y-4">
                     <Text className="text-gray90 text-[15px] font-semibold w-full text-center">
-                        {formatDate(new Date().toISOString())}
+                        {currentDiary?.created_at ? formatDate(currentDiary.created_at) : '-'}
                     </Text>
                     <EmotionComponent
                         className="self-center"
