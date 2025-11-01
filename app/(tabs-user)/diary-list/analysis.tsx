@@ -1,17 +1,15 @@
 import { queries } from "@/entities";
 import { Emotion } from "@/entities/voices/api/schema";
+import { EmotionIconComponent } from "@/shared/lib/emotions/components/EmotionIconComponent";
 import { BackHeader, HelpButton, MainLayout } from "@/shared/ui";
-import { EmotionIconComponent } from "@/shared/ui/components/emotions";
 import { formatDateRange, formatYearMonth, getWeekOfMonth, getWeekRange } from "@/shared/util/format";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-// 감정 타입 확장 (분노 포함)
-type ExtendedEmotion = Emotion | "anger";
 
-// 다양한 감정 문자열을 내부 표준으로 정규화
-const normalizeEmotion = (raw?: string): ExtendedEmotion | null => {
+const normalizeEmotion = (raw?: string): Emotion | null => {
+  console.log({ raw })
   if (!raw) return null;
   const v = String(raw).trim().toLowerCase();
   // 영어
@@ -32,7 +30,7 @@ const normalizeEmotion = (raw?: string): ExtendedEmotion | null => {
 };
 
 // 감정 한글 이름
-const emotionNames: Record<ExtendedEmotion, string> = {
+const emotionNames: Record<Emotion, string> = {
   happy: "즐거움",
   calm: "평온",
   surprise: "놀람",
@@ -43,7 +41,7 @@ const emotionNames: Record<ExtendedEmotion, string> = {
 };
 
 // 감정 색상 (그래프용)
-const emotionColors: Record<ExtendedEmotion, string> = {
+const emotionColors: Record<Emotion, string> = {
   happy: "#FF9500", // 오렌지
   calm: "#34C759", // 초록
   surprise: "#FFCC00", // 노랑
@@ -93,7 +91,7 @@ function WeeklyStatistics({ username }: { username: string }) {
 
   // 주간 감정 데이터 (API 응답 구조에 맞게 조정)
   // 허용 포맷 예) { emotions | data | days }: Array<{ date?: string; day?: number|string; emotion?: string }>
-  const weeklyEmotions: (ExtendedEmotion | null)[] = Array(7).fill(null);
+  const weeklyEmotions: (Emotion | null)[] = Array(7).fill(null);
 
   // API 응답 구조 확인 및 디버깅
   console.log("=== Weekly Statistics Debug ===");
@@ -112,7 +110,7 @@ function WeeklyStatistics({ username }: { username: string }) {
   if (weeklyItems.length === 0) {
     console.log("No data from API, using test data");
     // 테스트 데이터: 각 요일에 샘플 감정 할당
-    const testEmotions: ExtendedEmotion[] = ["happy", "sad", "happy", "calm", "sad", "anxiety", "calm"];
+    const testEmotions: Emotion[] = ["happy", "sad", "happy", "calm", "sad", "anxiety", "calm"];
     testEmotions.forEach((emotion, idx) => {
       weeklyEmotions[idx] = emotion;
     });
@@ -161,7 +159,7 @@ function WeeklyStatistics({ username }: { username: string }) {
   const weeklySummary = weeklyData?.summary || "주 초반에는 즐겁고 안정적인 날들이 많았지만, 목요일부터 감정 상태가 급격히 바뀌었네요.";
 
   // Y축 감정 (위에서 아래로: 즐거움 -> 불안)
-  const yAxisEmotions: ExtendedEmotion[] = ["happy", "calm", "surprise", "sad", "anxiety", "anger"];
+  const yAxisEmotions: Emotion[] = ["happy", "calm", "surprise", "sad", "anxiety", "anger"];
 
   return (
     <View className="bg-white rounded-[20px] p-6 gap-y-4 mb-4">
@@ -319,7 +317,7 @@ function MonthlyFrequencyStatistics({ username }: { username: string }) {
 
   const frequency = monthlyData?.frequency || {};
 
-  const frequencyData: Record<ExtendedEmotion, number> = {
+  const frequencyData: Record<Emotion, number> = {
     happy: frequency.happy || 0,
     calm: frequency.calm || 0,
     surprise: frequency.surprise || 0,
@@ -352,7 +350,7 @@ function MonthlyFrequencyStatistics({ username }: { username: string }) {
     }
 
     const topEmotion = sortedEmotions[0];
-    const topCount = frequencyData[topEmotion as ExtendedEmotion];
+    const topCount = frequencyData[topEmotion as Emotion];
 
     let summary = `${currentDate.getMonth() + 1}월에는 `;
 
@@ -375,7 +373,7 @@ function MonthlyFrequencyStatistics({ username }: { username: string }) {
 
   const monthlySummary = generateMonthlySummary();
 
-  const emotionsForBar: ExtendedEmotion[] = ["happy", "calm", "surprise", "sad", "anxiety", "anger"];
+  const emotionsForBar: Emotion[] = ["happy", "calm", "surprise", "sad", "anxiety", "anger"];
 
   return (
     <View className="bg-white rounded-[20px] p-6 gap-y-4">

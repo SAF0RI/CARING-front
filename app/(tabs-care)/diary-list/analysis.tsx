@@ -1,7 +1,7 @@
 import { queries } from "@/entities";
 import { Emotion } from "@/entities/voices/api/schema";
+import { EmotionIconComponent } from "@/shared/lib/emotions/components/EmotionIconComponent";
 import { BackHeader, HelpButton, MainLayout } from "@/shared/ui";
-import { EmotionIconComponent } from "@/shared/ui/components/emotions";
 import { formatDateRange, formatYearMonth, getWeekOfMonth, getWeekRange } from "@/shared/util/format";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -12,6 +12,8 @@ type ExtendedEmotion = Emotion | "anger";
 
 // 다양한 감정 문자열을 내부 표준으로 정규화
 const normalizeEmotion = (raw?: string): ExtendedEmotion | null => {
+
+  console.log({ raw })
   if (!raw) return null;
   const v = String(raw).trim().toLowerCase();
   // 영어

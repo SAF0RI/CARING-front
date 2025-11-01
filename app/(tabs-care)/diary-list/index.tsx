@@ -45,8 +45,6 @@ export default function DiaryListScreen() {
         ...queries.care.careUserVoiceList(userInfo?.username ?? 'care'),
     });
 
-
-
     const renderDiaryCard = ({ item }: { item: CareVoiceListItem }) => {
         return (
             <DiaryListCard

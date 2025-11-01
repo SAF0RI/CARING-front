@@ -1,7 +1,7 @@
 import { queries } from "@/entities";
 import { Emotion } from "@/entities/voices/api/schema";
+import { EmotionIconComponent } from "@/shared/lib/emotions/components/EmotionIconComponent";
 import { MainHeader, MainLayout } from "@/shared/ui";
-import { EmotionIconComponent } from "@/shared/ui/components/emotions";
 import { Icon } from "@/shared/ui/svg";
 import { formatDateRange, formatYearMonth, getWeekOfMonth, getWeekRange } from "@/shared/util/format";
 import { cn } from "@/shared/util/style";

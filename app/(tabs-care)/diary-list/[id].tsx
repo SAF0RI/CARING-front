@@ -1,31 +1,15 @@
 import { queries } from "@/entities";
 import { deleteUserVoice } from "@/entities/voices/api/handler";
 import { Emotion } from "@/entities/voices/api/schema";
-import { BackHeader, EmotionIconComponent, HelpButton, MainLayout } from "@/shared/ui";
+import { emotionCharacteristics as emotionCharacteristicsMap, emotionKorMap } from "@/shared/lib/emotions";
+import { EmotionIconComponent } from "@/shared/lib/emotions/components/EmotionIconComponent";
+import { BackHeader, HelpButton, MainLayout } from "@/shared/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Alert, Text, View } from "react-native";
 
-// 확장된 감정 타입 (목업 데이터용)
-type ExtendedEmotion = Emotion | "anger";
-
-// 감정 한글 변환
-const getEmotionKoreanName = (emotion?: ExtendedEmotion | null): string => {
-    const emotionNames: Record<string, string> = {
-        happy: "즐거움",
-        calm: "안정",
-        surprise: "놀람",
-        sad: "슬픔",
-        anxiety: "불안",
-        anger: "분노",
-        unknown: "알 수 없음",
-    };
-    return emotionNames[emotion ?? "unknown"] ?? "알 수 없음";
-};
-
-// 감정 비율 목업 데이터 생성
-const getEmotionPercentages = (topEmotion?: ExtendedEmotion | null): Record<string, number> => {
+const getEmotionPercentages = (topEmotion?: Emotion | null): Record<string, number> => {
     const basePercentages: Record<string, number> = {
         happy: 40,
         calm: 30,
@@ -63,45 +47,6 @@ const getEmotionPercentages = (topEmotion?: ExtendedEmotion | null): Record<stri
 
     return basePercentages;
 };
-
-// 감정 특징 태그 목업 데이터
-const getEmotionCharacteristics = (topEmotion?: ExtendedEmotion | null): string[] => {
-    const characteristics: Record<string, string[]> = {
-        happy: [
-            "#음높이가 평소보다 높아요",
-            "#음량이 평소보다 크고 명확해요",
-            "#말의 속도가 경쾌하게 빨라요"
-        ],
-        calm: [
-            "#말투가 평온하고 차분해요",
-            "#음성이 일정하게 유지되어요",
-            "#말의 속도가 적절해요"
-        ],
-        surprise: [
-            "#음높이가 갑자기 변해요",
-            "#말의 속도가 빨라졌다 느려졌다 해요",
-            "#음량이 크게 변해요"
-        ],
-        sad: [
-            "#음높이가 낮아요",
-            "#말의 속도가 느려요",
-            "#음량이 작고 흐려요"
-        ],
-        anxiety: [
-            "#말의 속도가 불규칙해요",
-            "#음성이 떨려요",
-            "#음높이가 불안정해요"
-        ],
-        anger: [
-            "#음량이 평소보다 커요",
-            "#말의 속도가 급격히 빨라요",
-            "#음높이가 높아요"
-        ],
-    };
-
-    return characteristics[topEmotion ?? "unknown"] ?? characteristics["happy"];
-};
-
 // 감정 색상 매핑
 const getEmotionColor = (emotion: string): string => {
     const colors: Record<string, string> = {
@@ -133,9 +78,9 @@ export default function DiaryDetailScreen() {
     });
 
     const currentDiary = diary?.voice_id === Number(id) ? diary : null;
-    const topEmotion = (currentDiary?.top_emotion ?? null) as ExtendedEmotion | null;
+    const topEmotion = (currentDiary?.top_emotion ?? null) as Emotion | null;
     const emotionPercentages = getEmotionPercentages(topEmotion);
-    const emotionCharacteristics = getEmotionCharacteristics(topEmotion);
+    const emotionCharacteristics = emotionCharacteristicsMap[topEmotion ?? 'unknown'];
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -176,13 +121,13 @@ export default function DiaryDetailScreen() {
                             isBig={false}
                         />
                         <Text className="text-gray90 text-[19px] font-bold">
-                            {userInfo?.name ?? '사용자'} 님이 {getEmotionKoreanName(topEmotion)} 상태예요!
+                            {userInfo?.name ?? '사용자'} 님이 {emotionKorMap[topEmotion ?? 'unknown']} 상태예요!
                         </Text>
                     </View>
 
                     {/* 중간 섹션: 감정 특징 */}
                     <View className="gap-y-3">
-                        {emotionCharacteristics.map((characteristic, index) => (
+                        {emotionCharacteristics.map((characteristic: string, index: number) => (
                             <View
                                 key={index}
                                 className="bg-gray10 rounded-[12px] px-4 py-3"
@@ -202,7 +147,7 @@ export default function DiaryDetailScreen() {
                         {emotionOrder.map((emotion) => {
                             const percentage = emotionPercentages[emotion] ?? 0;
                             const color = getEmotionColor(emotion);
-                            const emotionName = getEmotionKoreanName(emotion);
+                            const emotionName = emotionKorMap[emotion ?? 'unknown'];
 
                             return (
                                 <View key={emotion} className="flex-row items-center gap-x-3">
@@ -229,7 +174,6 @@ export default function DiaryDetailScreen() {
 
                 </View>
             </MainLayout.Content>
-
         </MainLayout >
     );
 }

@@ -11,7 +11,8 @@ export type Emotion =
   | "calm"
   | "happy"
   | "sad"
-  | "surprise";
+  | "surprise"
+  | "anger";
 
 // Upload voice with question (multipart/form-data + optional username query)
 export interface UploadVoiceWithQuestionRequest {
