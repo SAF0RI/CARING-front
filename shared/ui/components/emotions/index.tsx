@@ -28,11 +28,13 @@ export const EmotionComponent = ({
     emotion = 'calm',
     isBig = false,
     className,
+    noText = false,
 }: {
     showAiAnalysisText?: boolean;
     emotion?: Emotion,
     isBig?: boolean;
     className?: string;
+    noText?: boolean;
 }) => {
     const bgColorMap = {
         unknown: 'bg-gray10',

@@ -11,7 +11,7 @@ import {
 export const getCareUserVoiceList = async (
   care_username: string,
   skip: number = 0,
-  limit: number = 20
+  limit: number = 100
 ): Promise<CareUserVoiceListResponse> => {
   const query = `care_username=${encodeURIComponent(care_username)}&skip=${skip}&limit=${limit}`;
   const response = await GetAxiosInstance<CareUserVoiceListResponse>(
@@ -39,4 +39,3 @@ export const getEmotionWeeklySummary = async (
   );
   return response.data;
 };
-

@@ -14,7 +14,18 @@ export interface MonthlyFrequencyRequest {
   month: string; // e.g. 2025-10
 }
 
-export type MonthlyFrequencyResponse = Record<string, any>;
+export interface MonthlyFrequencyResponse {
+  success: boolean;
+  frequency: {
+    unknown?: number;
+    happy?: number;
+    calm?: number;
+    surprise?: number;
+    sad?: number;
+    anxiety?: number;
+    angry?: number; // API에서는 "angry"로 오지만 코드에서는 "anger"로 사용
+  };
+}
 
 export interface WeeklySummaryRequest {
   care_username: string;
@@ -23,4 +34,3 @@ export interface WeeklySummaryRequest {
 }
 
 export type WeeklySummaryResponse = Record<string, any>;
-

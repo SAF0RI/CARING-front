@@ -20,7 +20,7 @@ const DiaryListCard = ({ diary, isPlaying, isBuffering = false, onPress }: Diary
     return (
         <TouchableOpacity
             className={`rounded-[20px] p-4 gap-y-2 bg-gray1 mx-4`}
-            onPress={() => router.push(`/diary-list/${diary.voice_id}`)}
+            onPress={() => router.push(`/(tabs-user)/diary-list/${diary.voice_id}`)}
         >
             <View className="bg-gray10 rounded-full px-4 py-1 w-fit self-start">
                 <Text className="text-gray90 text-[15px] font-semibold">{formatDate(diary.created_at)}</Text>

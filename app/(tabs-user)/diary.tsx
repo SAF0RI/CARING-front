@@ -157,9 +157,9 @@ export default function DiaryScreen() {
                 />
             </MainLayout.Header>
             {/* 상단 질문 컴포넌트 */}
-            <View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px]">
+            <View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px] px-4">
                 <Text className="text-gray90 text-[15px]">어떤 이야기도 괜찮아요!</Text>
-                <Text className="text-xl font-bold">
+                <Text className="text-xl font-bold text-center flex-wrap px-8">
                     {isFetchingRandomQuestion ? '질문을 불러오는 중입니다' : randomQuestion?.question.content ?? ''}
                 </Text>
             </View>
@@ -213,3 +213,4 @@ export default function DiaryScreen() {
         </MainLayout >
     );
 }
+

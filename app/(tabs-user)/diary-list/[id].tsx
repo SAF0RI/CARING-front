@@ -54,7 +54,7 @@ export default function DiaryDetailScreen() {
         },
         onSettled: () => {
             setIsModalVisible(false);
-            router.replace('/diary-list');
+            router.replace('/(tabs-user)/diary-list');
             queryClient.invalidateQueries(queries.voices.userVoiceList(userInfo?.username ?? ''));
         }
     });

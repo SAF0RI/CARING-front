@@ -1,3 +1,4 @@
+import { queries } from "@/entities";
 import { signIn } from "@/entities/user/api";
 import { Role, UserInfo } from "@/entities/user/api/schema";
 import { setLocalUserInfo } from "@/entities/user/api/storage";
@@ -5,7 +6,7 @@ import { Button } from "@/shared/ui/buttons";
 import { LoginInput } from "@/shared/ui/input";
 import { Icon } from "@/shared/ui/svg";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useForm, useWatch } from "react-hook-form";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
@@ -14,6 +15,7 @@ import { z } from "zod";
 export default function LoginScreen() {
 
     const router = useRouter();
+    const queryClient = useQueryClient();
 
     const { control, handleSubmit, setValue, formState: { errors } } = useForm<{ username: string; password: string; role: Role }>({
         defaultValues: {
@@ -40,8 +42,15 @@ export default function LoginScreen() {
             };
 
             await setLocalUserInfo(userInfo);
+            
+            // React Query 캐시에 userInfo 업데이트
+            queryClient.setQueryData(queries.user.userInfo.queryKey, userInfo);
 
-            router.replace("/diary-list");
+            if (data.role === Role.CARE) {
+                router.replace("/(tabs-care)/home");
+            } else {
+                router.replace("/(tabs-user)/diary-list");
+            }
 
         },
         onError: () => {

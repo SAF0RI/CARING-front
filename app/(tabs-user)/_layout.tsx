@@ -1,7 +1,7 @@
 import { Icon } from "@/shared/ui/svg/SvgIcon";
 import { Tabs } from "expo-router";
 
-export default function TabsLayout() {
+export default function UserTabsLayout() {
     return (
         <Tabs screenOptions={{
             headerShown: false,
@@ -14,7 +14,10 @@ export default function TabsLayout() {
                 options={{
                     title: "일기 리스트",
                     tabBarIcon: ({ focused }) => (
-                        <Icon name={focused ? "ListActive" : "ListDisabled"} size={24} />
+                        <Icon
+                            name={focused ? "ListActive" : "ListDisabled"}
+                            size={24}
+                        />
                     ),
                 }}
             />
@@ -23,7 +26,10 @@ export default function TabsLayout() {
                 options={{
                     title: "마음 일기",
                     tabBarIcon: ({ focused }) => (
-                        <Icon name={focused ? "NoteActive" : "NoteDisabled"} size={24} />
+                        <Icon
+                            name={focused ? "NoteActive" : "NoteDisabled"}
+                            size={24}
+                        />
                     ),
                 }}
             />
@@ -32,22 +38,14 @@ export default function TabsLayout() {
                 options={{
                     title: "내 정보",
                     tabBarIcon: ({ focused }) => (
-                        <Icon name={focused ? "AccountActive" : "AccountDisabled"} size={24} />
-                    ),
-                }}
-            />
-            {/* 주석 예정 */}
-            <Tabs.Screen
-                name="demo"
-                options={{
-                    title: "데모",
-                    tabBarIcon: ({ focused }) => (
-                        <Icon name={focused ? "AccountActive" : "AccountDisabled"} size={24} />
+                        <Icon
+                            name={focused ? "AccountActive" : "AccountDisabled"}
+                            size={24}
+                        />
                     ),
                 }}
             />
         </Tabs>
     );
 }
-
 
