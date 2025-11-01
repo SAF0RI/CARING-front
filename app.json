@@ -21,6 +21,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
+      "usesCleartextTraffic": true,
       "package": "com.phobipark.caring",
       "googleServicesFile": "./google-services.json"
     },
@@ -58,7 +59,8 @@
           "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      "./plugins/with-network-security-config"
     ],
     "experiments": {
       "typedRoutes": true,
