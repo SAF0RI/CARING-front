@@ -15,9 +15,6 @@ type DiaryListCardProps = {
 
 const DiaryListCard = ({ diary, onPress }: DiaryListCardProps) => {
 
-
-
-
     return (
         <TouchableOpacity
             className={`rounded-[20px] px-4 gap-y-2 bg-gray1 mx-4`}

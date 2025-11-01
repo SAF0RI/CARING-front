@@ -159,7 +159,7 @@ export default function SignupScreen() {
                                     placeholder="ex) 홍길동"
                                     secureTextEntry={false}
                                     label="피보호자 닉네임 검색"
-                                    sublabel="피보호자 닉네임을 입력해주세요."
+                                    sublabel="피보호자의 내 정보에서 아이디를 확인해주세요."
                                 />
                             )}
                         </View>
