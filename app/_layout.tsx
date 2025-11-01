@@ -1,25 +1,71 @@
+import { queries } from "@/entities";
+import type { UserInfo } from "@/entities/user/api/schema";
+import { Role } from "@/entities/user/api/schema";
+import { getLocalUserInfo } from "@/entities/user/api/storage";
 import { FcmProvider } from '@/shared/lib/fcm';
-import { useAuthStore } from "@/shared/model/store/authStore";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Redirect, Slot, useRootNavigationState, useSegments } from "expo-router";
+import { useEffect, useMemo, useState } from 'react';
 import "../index.css";
 
 export default function RootLayout() {
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
 
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const segments = useSegments();
   const navigationState = useRootNavigationState();
 
-  if (!navigationState?.key) return null;
-
   const inAuthGroup = segments[0] === "(auth)";
-  if (!isAuthenticated && !inAuthGroup) {
+
+  // QueryClient를 메모이제이션하여 앱이 재시작될 때마다 새로 생성되지 않도록 함
+  const queryClient = useMemo(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+      mutations: {
+        onMutate: (variables) => {
+          console.log("[RQ][Mutation][Request]", variables);
+        },
+        onSuccess: (data, variables) => {
+          console.log("[RQ][Mutation][Response]", { data, variables });
+        },
+        onError: (error, variables) => {
+          console.log("[RQ][Mutation][Error]", { error, variables });
+        },
+      },
+    },
+  }), []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const info = await getLocalUserInfo();
+        setUserInfo(info);
+
+        // 로드된 userInfo를 React Query 캐시에 초기 데이터로 설정
+        if (info) {
+          queryClient.setQueryData(queries.user.userInfo.queryKey, info);
+        }
+      } finally {
+        setIsLoadingUser(false);
+      }
+    })();
+  }, [queryClient]);
+
+  if (!navigationState?.key) return null;
+  if (isLoadingUser) return null;
+
+  if (!userInfo && !inAuthGroup) {
     return <Redirect href="/(auth)/login" />;
   }
-  if (isAuthenticated && inAuthGroup) {
-    return <Redirect href="/(tabs)/diary-list" />;
+  if (userInfo && inAuthGroup) {
+    // 역할에 따라 적절한 탭 그룹으로 리다이렉트
+    if (userInfo.role === Role.CARE) {
+      return <Redirect href="/(tabs-care)/home" />;
+    }
+    return <Redirect href="/(tabs-user)/diary-list" />;
   }
-  const queryClient = new QueryClient();
 
   return (
     <QueryClientProvider client={queryClient}>

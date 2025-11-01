@@ -24,6 +24,7 @@ export const Button = ({
     layoutClassName,
     innerClassName,
     hasArrow = false,
+    disabled = false,
     ...props
 }: ButtonProps) => {
     const sizeClass = size === "lg" ? "mx-6 py-4" : "mx-4 py-3";
@@ -33,20 +34,20 @@ export const Button = ({
 
 
     const palette = {
-        bg: variant === "filled" ? "bg-main800" : "bg-transparent",
-        border: variant === "outlined" ? "border border-main800" : "",
-        text: variant === "filled" ? "text-white" : "text-primary",
+        bg: variant === "filled" ? disabled ? "bg-gray40" : "bg-main800" : "bg-transparent",
+        border: variant === "outlined" ? disabled ? "border border-gray-40" : "border border-main800" : "",
+        text: variant === "filled" ? disabled ? "text-gray100" : "text-white" : "text-primary",
     };
 
     const containerClasses = cn([
-        "rounded-xl", variant === "text" ? "" : sizeClass, palette.bg, palette.border, layoutClass, className ?? "", innerClassName ?? "",
+        "rounded-xl", variant === "text" ? "" : sizeClass, palette.bg, palette.border, layoutClass, className ?? "",
     ]
         .filter(Boolean)
     );
 
     return (
         <View className={cn(["w-full", layoutClassName ?? ""])}>
-            <TouchableOpacity className={containerClasses} {...props}>
+            <TouchableOpacity className={containerClasses} disabled={disabled} {...props}>
                 <View className={cn(["font-semibold", textSizeClass, palette.text, innerClassName ?? "", hasArrow ? "flex-row items-center justify-center gap-x-1" : ""])}>{children}
                     {hasArrow && <Icon name={variant === "filled" ? "ChevronRightWhite" : "ChevronRightBlack"} />}
                 </View>

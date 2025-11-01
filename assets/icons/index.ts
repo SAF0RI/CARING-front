@@ -151,3 +151,8 @@ export { default as FooterLogo } from "./footer/ic_logo_footer.svg";
 // header icon
 export { default as HeaderQuestionIcon } from "./header/ic_ques.svg";
 export { default as HeaderLogo } from "./header/logo_header.svg";
+
+// spinner icon
+export { default as Spinner } from "./ic_spinner.svg";
+
+export { default as Surprise } from "./emotions/ic_surprise.svg";

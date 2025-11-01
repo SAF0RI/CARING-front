@@ -1,5 +1,8 @@
+import { queries } from '@/entities/index';
+import { getLocalUserInfo } from "@/entities/user/api/storage";
+import { UploadVoiceWithQuestionRequest, uploadVoiceWithQuestion } from "@/entities/voices/api";
 import { Button, HelpButton, Icon, MainHeader, MainLayout, RecordingTimer, SpeechBubble } from "@/shared/ui";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     RecordingPresets,
     RecordingStatus,
@@ -18,6 +21,11 @@ const bubbleText = {
 };
 
 export default function DiaryScreen() {
+
+    const { data: randomQuestion, isFetching: isFetchingRandomQuestion } = useQuery(queries.questions.randomQuestion);
+
+    const questionId = randomQuestion?.question.question_id;
+
     const [currentBubbleText, setCurrentBubbleText] = useState(bubbleText.play);
 
     const audioRecorder = useAudioRecorder(
@@ -74,122 +82,70 @@ export default function DiaryScreen() {
         await record();
     };
 
+    const { mutateAsync: uploadVoiceWithQuestionMutation } = useMutation({
+        mutationFn: async (data: UploadVoiceWithQuestionRequest) => await uploadVoiceWithQuestion(data),
+    });
+
+    const queryClient = useQueryClient();
+
     const handleSaveServer = async () => {
         try {
             await stopRecording();
 
-            if (audioRecorder.uri) {
-                // 1. 파일을 FormData로 준비
-                const fileName = `diary_${Date.now()}.m4a`;
-                const formData = new FormData();
-
-                // 파일을 FormData에 추가
-                formData.append('audio', {
-                    uri: audioRecorder.uri,
-                    type: 'audio/m4a',
-                    name: fileName,
-                } as any);
-
-                // 2. 메타데이터 추가
-                formData.append('metadata', JSON.stringify({
-                    duration: recordingState.durationMillis,
-                    createdAt: new Date().toISOString(),
-                    title: "오늘의 마음일기"
-                }));
-
-                // 3. 서버에 업로드
-                const response = await fetch('https://your-api-endpoint.com/api/diary/upload', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-
-                    const diaryEntry = {
-                        id: result.id || Date.now().toString(),
-                        fileName: fileName,
-                        serverUrl: result.fileUrl,
-                        duration: recordingState.durationMillis,
-                        createdAt: new Date().toISOString(),
-                        title: "오늘의 마음일기",
-                        serverId: result.id
-                    };
-
-                    const existingDiaries = await AsyncStorage.getItem('diaries');
-                    const diaries = existingDiaries ? JSON.parse(existingDiaries) : [];
-
-                    diaries.push(diaryEntry);
-
-                    await AsyncStorage.setItem('diaries', JSON.stringify(diaries));
-
-                    Alert.alert(
-                        "저장 완료!",
-                        "마음일기가 성공적으로 서버에 저장되었습니다.",
-                        [{ text: "확인" }]
-                    );
-
-                    setCurrentBubbleText(bubbleText.play);
-                } else {
-                    throw new Error('서버 업로드 실패');
-                }
-
-            } else {
+            if (!audioRecorder.uri) {
                 Alert.alert("오류", "저장할 녹음 파일이 없습니다.");
+                return;
             }
+
+            const userInfo = await getLocalUserInfo();
+            const username = userInfo?.username;
+            if (!username) {
+                Alert.alert("오류", "로그인이 필요합니다.");
+                return;
+            }
+
+            const fileName = `diary_${Date.now()}.m4a`;
+
+            if (!questionId) {
+                Alert.alert("오류", "질문 ID가 없습니다.");
+                return;
+            }
+
+            await uploadVoiceWithQuestionMutation(
+                {
+                    file: {
+                        uri: audioRecorder.uri,
+                        type: 'audio/m4a',
+                        name: fileName,
+                    },
+                    question_id: questionId,
+                    username,
+                },
+                {
+                    onSuccess: (data: any) => {
+                        if (data?.success) {
+                            Alert.alert("저장 완료!", "마음일기가 성공적으로 서버에 저장되었습니다.", [
+                                { text: "확인" },
+                            ]);
+                            setCurrentBubbleText(bubbleText.play);
+                            queryClient.invalidateQueries(queries.voices.userVoiceList(username));
+                        } else {
+                            Alert.alert("오류", data?.message || "서버 업로드 실패");
+                        }
+                    },
+                    onError: () => {
+                        Alert.alert("오류", "서버 업로드 중 문제가 발생했습니다.");
+                    },
+                }
+            );
         } catch (error) {
             console.error('저장 중 오류 발생:', error);
             Alert.alert("오류", "서버 업로드 중 문제가 발생했습니다.");
         }
     };
 
-    const handleSaveLocal = async () => {
-        try {
-            await stopRecording();
 
-            if (audioRecorder.uri) {
-                // 로컬에 메타데이터만 저장 (파일은 audioRecorder.uri에 이미 존재)
-                const diaryEntry = {
-                    id: Date.now().toString(),
-                    fileName: `diary_${Date.now()}.m4a`,
-                    fileUri: audioRecorder.uri, // 로컬 파일 URI 사용
-                    duration: recordingState.durationMillis,
-                    createdAt: new Date().toISOString(),
-                    title: "오늘의 마음일기"
-                };
-
-                // 기존 일기 목록 가져오기
-                const existingDiaries = await AsyncStorage.getItem('diaries');
-                const diaries = existingDiaries ? JSON.parse(existingDiaries) : [];
-
-                // 새 일기 추가
-                diaries.push(diaryEntry);
-
-                // 저장
-                await AsyncStorage.setItem('diaries', JSON.stringify(diaries));
-
-                Alert.alert(
-                    "저장 완료!",
-                    "마음일기가 성공적으로 저장되었습니다.",
-                    [{ text: "확인" }]
-                );
-
-                // 녹음 상태 초기화
-                setCurrentBubbleText(bubbleText.play);
-
-            } else {
-                Alert.alert("오류", "저장할 녹음 파일이 없습니다.");
-            }
-        } catch (error) {
-            console.error('저장 중 오류 발생:', error);
-            Alert.alert("오류", "저장 중 문제가 발생했습니다.");
-        }
-    };
-
-    const handleSave = handleSaveLocal; // 현재는 로컬 저장 사용
+    const handleSave = handleSaveServer;
 
 
     return (
@@ -201,12 +157,11 @@ export default function DiaryScreen() {
                 />
             </MainLayout.Header>
             {/* 상단 질문 컴포넌트 */}
-            <View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px]">
+            <View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px] px-4">
                 <Text className="text-gray90 text-[15px]">어떤 이야기도 괜찮아요!</Text>
-                <Text className="text-xl font-bold">
-                    오늘 <Text className="text-main700">가장 즐거웠던 일</Text>은
+                <Text className="text-xl font-bold text-center flex-wrap px-8">
+                    {isFetchingRandomQuestion ? '질문을 불러오는 중입니다' : randomQuestion?.question.content ?? ''}
                 </Text>
-                <Text className="text-xl font-bold">무엇인가요?</Text>
             </View>
 
             <View className="w-full mt-8 px-5">
@@ -258,3 +213,4 @@ export default function DiaryScreen() {
         </MainLayout >
     );
 }
+

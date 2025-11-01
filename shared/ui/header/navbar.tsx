@@ -5,7 +5,7 @@ import { Icon } from '../svg';
 type HeaderProps = {
     title: string;
     navigateTo?: string;
-    rightComponent: React.ReactNode;
+    rightComponent?: React.ReactNode;
 }
 
 export const BackHeader = ({ title, navigateTo, rightComponent }: HeaderProps) => {
@@ -27,9 +27,11 @@ export const BackHeader = ({ title, navigateTo, rightComponent }: HeaderProps) =
             <Text className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-lg text-gray100">
                 {title}
             </Text>
-            <TouchableOpacity className="absolute right-4 h-16 flex justify-center">
-                {rightComponent}
-            </TouchableOpacity>
+            {rightComponent && (
+                <TouchableOpacity className="absolute right-4 h-16 flex justify-center">
+                    {rightComponent}
+                </TouchableOpacity>
+            )}
         </View>
     );
 };

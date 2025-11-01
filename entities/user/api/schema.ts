@@ -1,18 +1,20 @@
-// User Info to be stored in AsyncStorage
+export enum Role {
+  CARE = "CARE",
+  USER = "USER",
+}
 export interface UserInfo {
   user_code: string;
   username: string;
   name: string;
-  role: string;
+  role: Role;
 }
 
-// Storage Key
 export const USER_STORAGE_KEY = "@user_info";
 
-// Request Types
 export interface SignInRequest {
   username: string;
   password: string;
+  role: Role;
 }
 
 export interface SignUpRequest {
@@ -20,16 +22,15 @@ export interface SignUpRequest {
   birthdate: string;
   username: string;
   password: string;
-  role: string;
+  role: Role;
   connecting_user_code: string;
 }
 
-// Response Types
 export interface SignInResponse {
   message: string;
   username: string;
   name: string;
-  role: string;
+  role: Role;
 }
 
 export interface SignUpResponse {
@@ -37,7 +38,7 @@ export interface SignUpResponse {
   user_code: string;
   username: string;
   name: string;
-  role: string;
+  role: Role;
 }
 
 export type GetUserInfoResponse = UserInfo;

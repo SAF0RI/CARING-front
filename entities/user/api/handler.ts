@@ -10,11 +10,15 @@ import {
 export const signIn = async ({
   username,
   password,
+  role,
 }: SignInRequest): Promise<SignInResponse> => {
-  const response = await PostAxiosInstance<SignInResponse>("/sign-in", {
-    username,
-    password,
-  });
+  const response = await PostAxiosInstance<SignInResponse>(
+    `/sign-in?role=${role}`,
+    {
+      username,
+      password,
+    }
+  );
   return response.data;
 };
 

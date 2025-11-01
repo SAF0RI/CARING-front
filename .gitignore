@@ -46,3 +46,5 @@ app-example
 *.ipa
 
 google-services.json
+
+*.env
