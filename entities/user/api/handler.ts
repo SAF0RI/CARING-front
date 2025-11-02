@@ -1,10 +1,14 @@
-import { PostAxiosInstance } from "@/shared/axios/axios.method";
+import {
+  GetAxiosInstance,
+  PostAxiosInstance,
+} from "@/shared/axios/axios.method";
 
 import {
   SignInRequest,
   SignInResponse,
   SignUpRequest,
   SignUpResponse,
+  UserInfoResponse,
 } from "./schema";
 
 export const signIn = async ({
@@ -38,5 +42,16 @@ export const signUp = async ({
     role,
     connecting_user_code,
   });
+  return response.data;
+};
+
+export const getUserInfo = async ({
+  username,
+}: {
+  username: string;
+}): Promise<UserInfoResponse> => {
+  const response = await GetAxiosInstance<UserInfoResponse>(
+    `/users?username=${username}`
+  );
   return response.data;
 };

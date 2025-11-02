@@ -1,5 +1,6 @@
 import { createQueryKeys } from "@lukemorales/query-key-factory";
 
+import { getUserInfo } from "./handler";
 import { getLocalUserInfo } from "./storage";
 
 export const userQueries = createQueryKeys("user", {
@@ -7,4 +8,8 @@ export const userQueries = createQueryKeys("user", {
     queryKey: null,
     queryFn: () => getLocalUserInfo(),
   },
+  userPageInfo: (username: string) => ({
+    queryKey: [username],
+    queryFn: () => getUserInfo({ username }),
+  }),
 });

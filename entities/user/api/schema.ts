@@ -41,4 +41,10 @@ export interface SignUpResponse {
   role: Role;
 }
 
+export interface UserInfoResponse {
+  name: string;
+  username: string;
+  connected_care_name: string;
+}
+
 export type GetUserInfoResponse = UserInfo;

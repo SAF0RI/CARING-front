@@ -6,7 +6,7 @@ export const emotionCharacteristics: Record<Emotion, string[]> = {
     "#음량이 평소보다 크고 명확해요",
     "#말의 속도가 경쾌하게 빨라요",
   ],
-  calm: [
+  neutral: [
     "#말투가 평온하고 차분해요",
     "#음성이 일정하게 유지되어요",
     "#말의 속도가 적절해요",
@@ -17,12 +17,12 @@ export const emotionCharacteristics: Record<Emotion, string[]> = {
     "#음량이 크게 변해요",
   ],
   sad: ["#음높이가 낮아요", "#말의 속도가 느려요", "#음량이 작고 흐려요"],
-  anxiety: [
+  fear: [
     "#말의 속도가 불규칙해요",
     "#음성이 떨려요",
     "#음높이가 불안정해요",
   ],
-  anger: [
+  angry: [
     "#음량이 평소보다 커요",
     "#말의 속도가 급격히 빨라요",
     "#음높이가 높아요",

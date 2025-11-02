@@ -61,3 +61,20 @@ export interface UploadVoiceResponse {
   voiceId?: string;
   fileUrl?: string;
 }
+
+export interface VoiceAnalyzePreviewRequest {
+  voice_id: number;
+  care_username: string;
+}
+
+export interface VoiceAnalyzePreviewResponse {
+  voice_id?: number | null;
+  happy_pct: number;
+  sad_pct: number;
+  neutral_pct: number;
+  angry_pct: number;
+  fear_pct: number;
+  surprise_pct: number;
+  top_emotion?: string | null;
+  top_emotion_confidence_pct?: number | null;
+}

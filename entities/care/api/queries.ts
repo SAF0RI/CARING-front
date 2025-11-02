@@ -1,5 +1,6 @@
 import { createQueryKeys } from "@lukemorales/query-key-factory";
 import {
+  getCareUserInfo,
   getCareUserVoiceList,
   getEmotionMonthlyFrequency,
   getEmotionWeeklySummary,
@@ -21,5 +22,9 @@ export const careQueries = createQueryKeys("care", {
   careUserVoiceList: (care_username: string) => ({
     queryKey: [care_username],
     queryFn: () => getCareUserVoiceList(care_username),
+  }),
+  careUserInfo: (care_username: string) => ({
+    queryKey: [care_username],
+    queryFn: () => getCareUserInfo({ care_username }),
   }),
 });

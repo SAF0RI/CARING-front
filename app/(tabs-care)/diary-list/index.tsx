@@ -1,8 +1,8 @@
-import { Button, Footer, HelpButton, MainHeader, MainLayout } from "@/shared/ui";
+import { HelpButton, Icon, MainHeader, MainLayout } from "@/shared/ui";
 
 import { queries } from "@/entities";
 import { CareVoiceListItem } from "@/entities/care/api/schema";
-import { Icon } from "@/shared/ui/svg";
+import { emotionKorMap } from "@/shared/lib/emotions";
 import { formatDate } from "@/shared/util/format";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -13,11 +13,11 @@ type DiaryListCardProps = {
     onPress: () => void;
 }
 
-const DiaryListCard = ({ diary, onPress }: DiaryListCardProps) => {
+const DiaryListCard = ({ diary }: DiaryListCardProps) => {
 
     return (
         <TouchableOpacity
-            className={`rounded-[20px] px-4 gap-y-2 bg-gray1 mx-4`}
+            className={`rounded-[20px] px-4 gap-y-2 bg-gray1 mx-4 py-4`}
             onPress={() => router.push(`/diary-list/${diary.voice_id}`)}
         >
             <View className="bg-gray10 rounded-full px-4 py-1 w-fit self-start">
@@ -27,7 +27,7 @@ const DiaryListCard = ({ diary, onPress }: DiaryListCardProps) => {
                 <Icon name="fear" size={24} />
                 <View className="flex-1 ml-2">
                     <Text className="text-gray90 text-[15px] ">{'홍길동 님은'}</Text>
-                    <Text className="text-gray90 text-[15px] font-semibold">{`${diary.emotion} 상태에요!`}</Text>
+                    <Text className="text-gray90 text-[15px] font-semibold">{`${emotionKorMap[diary.emotion ?? 'unknown']} 상태에요!`}</Text>
                 </View>
                 <Icon name="ChevronRightBlack" size={24} />
             </View>
@@ -42,8 +42,11 @@ export default function DiaryListScreen() {
     const { data: userInfo } = useQuery(queries.user.userInfo);
 
     const { data: diaries, refetch, isFetching } = useQuery({
-        ...queries.care.careUserVoiceList(userInfo?.username ?? 'care'),
+        ...queries.care.careUserVoiceList(userInfo?.username ?? ''),
+        enabled: !!userInfo?.username,
     });
+
+    console.log({ diaries: diaries?.voices });
 
     const renderDiaryCard = ({ item }: { item: CareVoiceListItem }) => {
         return (
@@ -54,11 +57,6 @@ export default function DiaryListScreen() {
         );
     };
 
-    const demoData = {
-        voice_id: 1,
-        created_at: '2025-10-31T16:38:58',
-        emotion: 'angry',
-    }
 
     return (
         <MainLayout>
@@ -68,7 +66,6 @@ export default function DiaryListScreen() {
                     rightComponent={<HelpButton />}
                 />
             </MainLayout.Header>
-
             <MainLayout.Content className="bg-gray5 flex-1 p-0" footer={false}>
                 {false ? (
                     <View className="flex-1 justify-center items-center">
@@ -77,32 +74,16 @@ export default function DiaryListScreen() {
                     </View>
                 ) : (
                     <FlatList
-                        data={diaries?.voices ?? [
-                            demoData,
-                        ]}
+                        data={Array.from({ length: 10 }, () => diaries?.voices ?? []).flat()}
                         refreshControl={<RefreshControl refreshing={isFetching} onRefresh={() => { refetch() }} />}
                         renderItem={renderDiaryCard}
                         ItemSeparatorComponent={() => <View className="h-5" />}
-                        keyExtractor={(item) => item.voice_id.toString()}
-                        ListHeaderComponent={() => <View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px]">
-                            <Text className="text-gray90 text-[15px]">나를 더 알아가는 시간</Text>
-                            <Text className="text-xl font-bold">
-                                <Text className="text-main700">내 마음</Text>은 어땠을까요?
-                            </Text>
-                            <Button
-                                size="md"
-                                variant="filled"
-                                className="mx-20 mt-4"
-                                hasArrow
-                                onPress={() => router.push('/diary-list/analysis')}
-                            >
-                                <Text className="text-white font-bold text-[17px]">분석 결과 보기</Text>
-                            </Button>
-                        </View>}
-                        contentContainerStyle={{ flexGrow: 1 }}
-                        contentContainerClassName="gap-y-4"
+                        keyExtractor={(item, index) => `${item.voice_id}-${index}`}
+                        contentContainerStyle={{ flexGrow: 1, marginTop: 20 }}
+                        contentContainerClassName="gap-y-1"
                         showsVerticalScrollIndicator={false}
                         scrollEnabled
+                        ListFooterComponent={() => <View className="h-20" />}
                         ListEmptyComponent={
                             <View className="flex-1 justify-center items-center">
                                 <Text className="text-gray70 text-center text-lg">
@@ -110,7 +91,6 @@ export default function DiaryListScreen() {
                                 </Text>
                             </View>
                         }
-                        ListFooterComponent={() => <Footer />}
                     />
                 )}
             </MainLayout.Content>

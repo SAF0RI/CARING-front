@@ -1,12 +1,13 @@
 import { queries } from "@/entities";
 import { emotionBgColorMap } from "@/shared/lib/emotions";
 import { EmotionIconComponent, MonthlyFrequencyStatistics, WeeklyStatistics } from "@/shared/lib/emotions/components";
-import { MainHeader, MainLayout } from "@/shared/ui";
+import { Footer, MainHeader, MainLayout } from "@/shared/ui";
 import { Icon } from "@/shared/ui/svg";
 import { cn } from "@/shared/util/style";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 
 
@@ -14,13 +15,36 @@ export default function HomeScreen() {
 
     const userInfo = useQuery(queries.user.userInfo);
     const router = useRouter();
+    const queryClient = useQueryClient();
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        try {
+            const username = userInfo?.data?.username;
+            await Promise.all([
+                userInfo.refetch(),
+                username ? Promise.all([
+                    queryClient.invalidateQueries({ queryKey: queries.care._def }),
+                ]) : Promise.resolve(),
+            ]);
+        } finally {
+            setRefreshing(false);
+        }
+    };
 
     return (
         <MainLayout className="bg-gray-50">
             <MainLayout.Header>
                 <MainHeader title="홈" />
             </MainLayout.Header>
-            <ScrollView showsVerticalScrollIndicator={false} className="w-full">
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                className="w-full"
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
                 {/* 상단 감정 컴포넌트 */}
                 <View className={cn(['flex-row w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px] px-4', emotionBgColorMap['fear']])}>
                     <EmotionIconComponent emotion="fear" isBig={true} />
@@ -62,9 +86,11 @@ export default function HomeScreen() {
                             <Icon name="ChevronRightBlack" size={24} />
                         </TouchableOpacity>
                     </View>
-                    <MonthlyFrequencyStatistics username={userInfo?.data?.username ?? ''} />
+                    <MonthlyFrequencyStatistics username={userInfo?.data?.username ?? ''} isReport={false} />
                 </View>
+                <Footer />
             </ScrollView>
+
         </MainLayout>
     );
 }

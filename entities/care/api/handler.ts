@@ -1,6 +1,7 @@
 import { GetAxiosInstance } from "@/shared/axios/axios.method";
 
 import {
+  CareUserInfoResponse,
   CareUserVoiceListResponse,
   MonthlyFrequencyRequest,
   MonthlyFrequencyResponse,
@@ -36,6 +37,17 @@ export const getEmotionWeeklySummary = async (
   const query = `care_username=${encodeURIComponent(params.care_username)}&month=${encodeURIComponent(params.month)}&week=${params.week}`;
   const response = await GetAxiosInstance<WeeklySummaryResponse>(
     `/care/users/voices/analyzing/weekly?${query}`
+  );
+  return response.data;
+};
+
+export const getCareUserInfo = async ({
+  care_username,
+}: {
+  care_username: string;
+}): Promise<CareUserInfoResponse> => {
+  const response = await GetAxiosInstance<CareUserInfoResponse>(
+    `/care?username=${care_username}`
   );
   return response.data;
 };

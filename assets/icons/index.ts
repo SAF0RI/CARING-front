@@ -154,3 +154,7 @@ export { default as HeaderLogo } from "./header/logo_header.svg";
 export { default as Spinner } from "./ic_spinner.svg";
 
 export { default as Surprise } from "./emotions/ic_surprise.svg";
+
+export { default as ConnectIcon } from "./ic_connect.svg";
+
+export { default as UserEmptyIcon } from "./img_user_empty.svg";

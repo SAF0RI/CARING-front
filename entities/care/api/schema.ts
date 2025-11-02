@@ -2,7 +2,7 @@ import { Emotion } from "@/entities/voices/api/schema";
 export interface CareVoiceListItem {
   voice_id: number;
   created_at: string;
-  emotion?: string | null;
+  emotion?: Emotion | null;
 }
 
 export interface CareUserVoiceListResponse {
@@ -28,6 +28,12 @@ export interface WeeklySummaryRequest {
   care_username: string;
   month: string; // e.g. 2025-10
   week: number; // 1..5
+}
+
+export interface CareUserInfoResponse {
+  name: string;
+  username: string;
+  connected_user_name: string;
 }
 
 export interface WeeklySummaryResponse {

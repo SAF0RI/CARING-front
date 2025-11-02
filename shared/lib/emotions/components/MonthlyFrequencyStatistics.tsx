@@ -7,7 +7,7 @@ import { useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 
-export const MonthlyFrequencyStatistics = ({ username }: { username: string }) => {
+export const MonthlyFrequencyStatistics = ({ username, isReport = true }: { username: string, isReport?: boolean }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const monthString = formatYearMonth(currentDate);
 
@@ -92,12 +92,16 @@ export const MonthlyFrequencyStatistics = ({ username }: { username: string }) =
         <View className="bg-white rounded-[20px] p-6 gap-y-4">
             {/* 헤더 */}
             <View className="flex-row items-center justify-between mb-2">
-                <TouchableOpacity
-                    onPress={handlePrevMonth}
-                    className="w-10 h-10 rounded-full bg-gray10 items-center justify-center"
-                >
-                    <Text className="text-gray90 text-xl">‹</Text>
-                </TouchableOpacity>
+                {
+                    isReport && (
+                        <TouchableOpacity
+                            onPress={handlePrevMonth}
+                            className="w-10 h-10 rounded-full bg-gray10 items-center justify-center"
+                        >
+                            <Text className="text-gray90 text-xl">‹</Text>
+                        </TouchableOpacity>
+                    )
+                }
 
                 <View className="items-center flex-1">
                     <Text className="text-gray90 text-[20px] font-bold">
@@ -105,12 +109,16 @@ export const MonthlyFrequencyStatistics = ({ username }: { username: string }) =
                     </Text>
                 </View>
 
-                <TouchableOpacity
-                    onPress={handleNextMonth}
-                    className="w-10 h-10 rounded-full bg-gray10 items-center justify-center"
-                >
-                    <Text className="text-gray90 text-xl">›</Text>
-                </TouchableOpacity>
+                {
+                    isReport && (
+                        <TouchableOpacity
+                            onPress={handleNextMonth}
+                            className="w-10 h-10 rounded-full bg-gray10 items-center justify-center"
+                        >
+                            <Text className="text-gray90 text-xl">›</Text>
+                        </TouchableOpacity>
+                    )
+                }
             </View>
 
             {/* 바 차트 */}
