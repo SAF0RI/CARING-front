@@ -61,10 +61,10 @@ export default function DiaryListScreen() {
     const handleCardPress = async (diaryId: string) => {
         const diary = diaries?.voices?.find((d: VoiceListItem) => d.voice_id === Number(diaryId));
         if (diary) {
-            // const audioUri = diary.serverUrl || diary.fileUri;
-            // if (audioUri) {
-            //     await playAudio(diaryId, audioUri);
-            // }
+            const audioUri = diary.s3_url;
+            if (audioUri) {
+                await playAudio(diaryId, audioUri);
+            }
         }
     };
 

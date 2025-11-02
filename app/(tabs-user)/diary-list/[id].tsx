@@ -7,7 +7,7 @@ import { formatDate } from "@/shared/util/format";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Alert, Modal, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Modal, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function DiaryDetailScreen() {
 
@@ -15,36 +15,25 @@ export default function DiaryDetailScreen() {
 
     const { data: userInfo } = useQuery(queries.user.userInfo);
 
-    const { data: diary } = useQuery({
+    const { data: diary, refetch, isFetching } = useQuery({
         ...queries.voices.userVoiceDetail(Number(id), userInfo?.username ?? ''),
         enabled: !!id && !!userInfo?.username,
     });
 
-
-    // if (!diary) {
-    //     Alert.alert('일기를 찾을 수 없습니다.');
-    //     return <Redirect href="/diary-list" />;
-    // }
 
     const currentDiary = diary?.voice_id === Number(id) ? diary : null;
     const { playAudio, isPlaying, isBuffering, player, status } = useAudioPlayer({});
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    // const handlePlayPress = async () => {
-    //     if (currentDiary) {
-    //         const audioUri = currentDiary.serverUrl || currentDiary.fileUri;
-    //         if (audioUri) {
-    //             await playAudio(currentDiary.id, audioUri);
-    //         }
-    //     }
-    // };
-
-    // const handleDeletePress = async () => {
-    //     const diaries = JSON.parse(await AsyncStorage.getItem('diaries') || '[]');
-    //     const newDiaries = diaries?.voices?.filter((diary: VoiceListItem) => diary.voice_id !== currentDiary?.voice_id);
-    //     await AsyncStorage.setItem('diaries', JSON.stringify(newDiaries));
-    // }
+    const handlePlayPress = async () => {
+        if (currentDiary) {
+            const audioUri = currentDiary.s3_url;
+            if (audioUri) {
+                await playAudio(currentDiary.voice_id.toString(), audioUri);
+            }
+        }
+    };
 
     const queryClient = useQueryClient();
 
@@ -67,39 +56,46 @@ export default function DiaryDetailScreen() {
             </MainLayout.Header>
 
             <MainLayout.Content className="bg-gray5 flex-1 p-4">
-                <View className="bg-white rounded-[20px] p-6 gap-y-4">
-                    <Text className="text-gray90 text-[15px] font-semibold w-full text-center">
-                        {currentDiary?.created_at ? formatDate(currentDiary.created_at) : '-'}
-                    </Text>
-                    <EmotionComponentWithText
-                        className="self-center"
-                        emotion={currentDiary?.top_emotion ?? 'unknown'} isBig={false} showAiAnalysisText={true} />
-                    <Text className="text-main900 text-[19px] font-bold">
-                        {currentDiary?.title ?? '오늘 주변에서 본 것 중 가장 보기 좋았던 풍경은 무엇인가요?'}
-                    </Text>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl refreshing={isFetching} onRefresh={() => { refetch(); }} />
+                    }
+                >
+                    <View className="bg-white rounded-[20px] p-6 gap-y-4">
+                        <Text className="text-gray90 text-[15px] font-semibold w-full text-center">
+                            {currentDiary?.created_at ? formatDate(currentDiary.created_at) : '-'}
+                        </Text>
+                        <EmotionComponentWithText
+                            className="self-center"
+                            emotion={currentDiary?.top_emotion ?? 'unknown'} isBig={false} showAiAnalysisText={true} />
+                        <Text className="text-main900 text-[19px] font-bold">
+                            {currentDiary?.title ?? '오늘 주변에서 본 것 중 가장 보기 좋았던 풍경은 무엇인가요?'}
+                        </Text>
 
-                    <Text className="text-black text-[17px] leading-6">
-                        {currentDiary?.voice_content ?? '아직 기록이 완성되지 않았습니다.'}
-                    </Text>
-                    {/* audio control component : 사진 참고 */}
-                    <AudioProgress
-                        player={player}
-                        status={status}
-                    />
-                    <AudioControlButton
-                        isPlaying={isPlaying(currentDiary?.voice_id.toString() || '')}
-                        isBuffering={isBuffering(currentDiary?.voice_id.toString() || '')}
-                        onPress={() => { }}
-                    />
-                    <View className="self-end">
-                        <Button variant="text" color="primary" onPress={() => setIsModalVisible(true)}>
-                            <View className="flex-row items-center justify-center gap-x-1">
-                                <Text className="text-gray70 text-[15px] font-semibold">일기 삭제하기</Text>
-                                <Icon name="Trash" />
-                            </View>
-                        </Button>
+                        <Text className="text-black text-[17px] leading-6">
+                            {currentDiary?.voice_content ?? '아직 기록이 완성되지 않았습니다.'}
+                        </Text>
+                        {/* audio control component : 사진 참고 */}
+                        <AudioProgress
+                            player={player}
+                            status={status}
+                        />
+                        <AudioControlButton
+                            isPlaying={isPlaying(currentDiary?.voice_id.toString() || '')}
+                            isBuffering={isBuffering(currentDiary?.voice_id.toString() || '')}
+                            onPress={handlePlayPress}
+                        />
+                        <View className="self-end">
+                            <Button variant="text" color="primary" onPress={() => setIsModalVisible(true)}>
+                                <View className="flex-row items-center justify-center gap-x-1">
+                                    <Text className="text-gray70 text-[15px] font-semibold">일기 삭제하기</Text>
+                                    <Icon name="Trash" />
+                                </View>
+                            </Button>
+                        </View>
                     </View>
-                </View>
+                </ScrollView>
             </MainLayout.Content>
             <Modal
                 visible={isModalVisible}

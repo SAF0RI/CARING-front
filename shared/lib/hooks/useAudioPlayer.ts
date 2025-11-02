@@ -45,19 +45,31 @@ export const useAudioPlayer = (options?: UseAudioPlayerOptions) => {
 
   const playAudio = async (diaryId: string, audioUri: string) => {
     if (playingId === diaryId) {
-      // 같은 오디오 클릭 - 토글
       if (status.playing) {
         await player.pause();
       } else {
-        await player.play();
+        // 일시정지 상태면 재개, 아니면 처음부터 재생
+        if (status.isLoaded && !status.didJustFinish) {
+          await player.play();
+        } else {
+          // 재생이 끝난 상태면 처음부터 다시 재생
+          await player.seekTo(0);
+          await player.play();
+        }
       }
     } else {
-      // 다른 오디오 클릭 - 이전 재생 중지 후 새 재생
       if (status.playing) {
         await player.pause();
       }
-      setPlayingId(diaryId);
-      setCurrentAudioUri(audioUri);
+
+      if (currentAudioUri === audioUri && status.isLoaded) {
+        await player.seekTo(0);
+        setPlayingId(diaryId);
+        await player.play();
+      } else {
+        setPlayingId(diaryId);
+        setCurrentAudioUri(audioUri);
+      }
     }
   };
 

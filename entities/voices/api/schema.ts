@@ -34,6 +34,7 @@ export interface VoiceListItem {
   emotion?: Emotion | null;
   question_title?: string | null;
   content: string;
+  s3_url: string;
 }
 
 export interface UserVoiceListResponse {
@@ -48,6 +49,7 @@ export interface UserVoiceDetailResponse {
   top_emotion?: Emotion | null;
   created_at: string;
   voice_content?: string | null;
+  s3_url: string;
 }
 
 // Backward-compatible simple upload (without question). Keep if referenced elsewhere.
