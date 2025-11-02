@@ -12,7 +12,7 @@ import {
     useAudioRecorderState,
 } from "expo-audio";
 import { useEffect, useState } from "react";
-import { Alert, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 const bubbleText = {
     play: "이 버튼을 누르면\n제가 귀 기울여 들을게요!",
@@ -22,7 +22,7 @@ const bubbleText = {
 
 export default function DiaryScreen() {
 
-    const { data: randomQuestion, isFetching: isFetchingRandomQuestion } = useQuery(queries.questions.randomQuestion);
+    const { data: randomQuestion, isFetching: isFetchingRandomQuestion, refetch: refetchRandomQuestion } = useQuery(queries.questions.randomQuestion);
 
     const questionId = randomQuestion?.question.question_id;
 
@@ -68,6 +68,12 @@ export default function DiaryScreen() {
     };
 
     const handleMainButtonPress = async () => {
+
+        if (isFetchingRandomQuestion) {
+            Alert.alert("오류", "질문을 불러오는 중입니다, 질문이 보이면 눌러주세요.");
+            return;
+        }
+
         if (recordingState.isRecording) {
             await pause();
             return;
@@ -82,7 +88,7 @@ export default function DiaryScreen() {
         await record();
     };
 
-    const { mutateAsync: uploadVoiceWithQuestionMutation } = useMutation({
+    const { mutateAsync: uploadVoiceWithQuestionMutation, isPending: isSaving } = useMutation({
         mutationFn: async (data: UploadVoiceWithQuestionRequest) => await uploadVoiceWithQuestion(data),
     });
 
@@ -128,12 +134,14 @@ export default function DiaryScreen() {
                                 { text: "확인" },
                             ]);
                             setCurrentBubbleText(bubbleText.play);
+                            // 목록 화면이 활성화되어 있으면 자동으로 새로고침, 아니면 다음 접근 시 새로고침
                             queryClient.invalidateQueries(queries.voices.userVoiceList(username));
                         } else {
                             Alert.alert("오류", data?.message || "서버 업로드 실패");
                         }
                     },
-                    onError: () => {
+                    onError: (error: any) => {
+                        console.error('서버 업로드 중 문제가 발생했습니다:', error);
                         Alert.alert("오류", "서버 업로드 중 문제가 발생했습니다.");
                     },
                 }
@@ -144,10 +152,6 @@ export default function DiaryScreen() {
         }
     };
 
-
-    const handleSave = handleSaveServer;
-
-
     return (
         <MainLayout className="bg-gray-50">
             <MainLayout.Header>
@@ -156,60 +160,86 @@ export default function DiaryScreen() {
                     rightComponent={<HelpButton />}
                 />
             </MainLayout.Header>
-            {/* 상단 질문 컴포넌트 */}
-            <View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px] px-4">
-                <Text className="text-gray90 text-[15px]">어떤 이야기도 괜찮아요!</Text>
-                <Text className="text-xl font-bold text-center flex-wrap px-8">
-                    {isFetchingRandomQuestion ? '질문을 불러오는 중입니다' : randomQuestion?.question.content ?? ''}
-                </Text>
-            </View>
-
-            <View className="w-full mt-8 px-5">
-                {/* 녹음 파형 및 타이머 컴포넌트 */}
-                <View className="flex flex-row items-center justify-center h-[60px] bg-gray10 rounded-[20px] w-full">
-                    {/* <WaveformVisualizer
-                    audioLevel={audioLevel}
-                    isRecording={isRecording}
-                    isPaused={isPaused}
-                    waveformData={waveformData}
-                /> */}
-                    <RecordingTimer
-                        duration={recordingState.durationMillis / 1000}
-                        isRecording={recordingState.isRecording}
-                        isPaused={!recordingState.isRecording}
+            <ScrollView
+                className="flex-1 w-full"
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={isFetchingRandomQuestion}
+                        onRefresh={refetchRandomQuestion}
                     />
-                </View>
-            </View>
-
-            <View className="flex-row items-center justify-center px-4 mt-10 relative w-full">
-                {/* 녹음 조정 버튼 - 항상 가운데 */}
-                <TouchableOpacity
-                    className={`w-[88px] h-[88px] rounded-full flex items-center justify-center bg-main500 ${recordingState.isRecording ? 'bg-main700' : ''}`}
-                    onPress={handleMainButtonPress}
-                >
-                    <Icon
-                        name={recordingState.isRecording ? "Stop" : "Mic"}
-                        width={40}
-                        height={40}
-                    />
-                </TouchableOpacity>
-
-                {/* 저장하기 버튼 - 우측에 위치 */}
-                {
-                    !recordingState.isRecording && recordingState.durationMillis > 0 && (
-                        <View className="absolute right-8">
-                            <Button size="lg" variant="filled" onPress={handleSave}>
-                                <Text className="text-white text-[15px] font-bold px-5">저장하기</Text>
-                            </Button>
-                        </View>
-                    )
                 }
-            </View>
-            <SpeechBubble className="h-fit w-fit px-5 flex items-center justify-center">
-                <Text className="text-gray-800 text-base text-center">
-                    {currentBubbleText}
-                </Text>
-            </SpeechBubble>
+            >
+                {/* 상단 질문 컴포넌트 */}
+                <View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px] px-4">
+                    <Text className="text-gray90 text-[15px]">어떤 이야기도 괜찮아요!</Text>
+                    <Text className="text-xl font-bold text-center flex-wrap px-8">
+                        {isFetchingRandomQuestion ? '질문을 불러오는 중입니다' : randomQuestion?.question.content ?? ''}
+                    </Text>
+                </View>
+
+                <View className="w-full mt-8 px-5">
+                    {/* 녹음 파형 및 타이머 컴포넌트 */}
+                    <View className="flex flex-row items-center justify-center h-[60px] bg-gray10 rounded-[20px] w-full">
+                        {/* <WaveformVisualizer
+                        audioLevel={audioLevel}
+                        isRecording={isRecording}
+                        isPaused={isPaused}
+                        waveformData={waveformData}
+                    /> */}
+                        <RecordingTimer
+                            duration={recordingState.durationMillis / 1000}
+                            isRecording={recordingState.isRecording}
+                            isPaused={!recordingState.isRecording}
+                        />
+                    </View>
+                </View>
+
+                <View className="flex-row items-center justify-center px-4 mt-10 relative w-full">
+                    {/* 녹음 조정 버튼 - 항상 가운데 */}
+                    <TouchableOpacity
+                        className={`w-[88px] h-[88px] rounded-full flex items-center justify-center bg-main500 ${recordingState.isRecording ? 'bg-main700' : ''}`}
+                        onPress={handleMainButtonPress}
+                    >
+                        <Icon
+                            name={recordingState.isRecording ? "Stop" : "Mic"}
+                            width={40}
+                            height={40}
+                        />
+                    </TouchableOpacity>
+
+                    {/* 저장하기 버튼 - 우측에 위치 */}
+                    {
+                        !recordingState.isRecording && recordingState.durationMillis > 0 && !isSaving && (
+                            <View className="absolute right-8">
+                                <Button size="lg" variant="filled" onPress={handleSaveServer}>
+                                    {
+                                        isSaving ? <ActivityIndicator size="small" color="white" /> :
+                                            <Text className="text-white text-[15px] font-bold px-5">저장하기</Text>
+                                    }
+                                </Button>
+                            </View>
+                        )
+                    }
+                    {
+                        isSaving && (
+                            <View className="absolute right-8">
+                                <Button className='flex-row items-center justify-center gap-x-2' size="lg" variant="filled" disabled>
+                                    <ActivityIndicator size="small" color="white" />
+                                    <Text className="text-white text-[15px] font-bold px-5">저장 중...</Text>
+                                </Button>
+                            </View>
+                        )
+                    }
+                </View>
+                <View className="flex items-center justify-center w-full">
+                    <SpeechBubble className="h-fit w-2/3 px-5 flex items-center justify-center">
+                        <Text className="text-gray-800 text-base text-center">
+                            {currentBubbleText}
+                        </Text>
+                    </SpeechBubble>
+                </View>
+            </ScrollView>
         </MainLayout >
     );
 }
