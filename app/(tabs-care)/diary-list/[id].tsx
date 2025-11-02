@@ -2,7 +2,7 @@ import { queries } from "@/entities";
 import { deleteUserVoice } from "@/entities/voices/api/handler";
 import { Emotion } from "@/entities/voices/api/schema";
 import { emotionCharacteristics as emotionCharacteristicsMap, emotionKorMap } from "@/shared/lib/emotions";
-import { EmotionIconComponent } from "@/shared/lib/emotions/components/EmotionIconComponent";
+import { EmotionIconComponent } from "@/shared/lib/emotions/components";
 import { BackHeader, HelpButton, MainLayout } from "@/shared/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
@@ -117,7 +117,7 @@ export default function DiaryDetailScreen() {
                     {/* 상단 섹션: 감정 상태 메시지 */}
                     <View className="flex-row items-center gap-x-2">
                         <EmotionIconComponent
-                            emotion={(topEmotion && topEmotion !== 'anger' ? (topEmotion as Emotion) : 'unknown')}
+                            emotion={(topEmotion ?? 'unknown')}
                             isBig={false}
                         />
                         <Text className="text-gray90 text-[19px] font-bold">
@@ -147,7 +147,7 @@ export default function DiaryDetailScreen() {
                         {emotionOrder.map((emotion) => {
                             const percentage = emotionPercentages[emotion] ?? 0;
                             const color = getEmotionColor(emotion);
-                            const emotionName = emotionKorMap[emotion ?? 'unknown'];
+                            const emotionName = emotionKorMap[emotion as Emotion] ?? '분석 중';
 
                             return (
                                 <View key={emotion} className="flex-row items-center gap-x-3">

@@ -7,13 +7,12 @@ export interface RNFileParam {
 
 export type Emotion =
   | "unknown"
-  | "anxiety"
-  | "calm"
+  | "surprise"
+  | "neutral"
   | "happy"
   | "sad"
-  | "surprise"
-  | "anger";
-
+  | "fear"
+  | "angry";
 // Upload voice with question (multipart/form-data + optional username query)
 export interface UploadVoiceWithQuestionRequest {
   file: RNFileParam;

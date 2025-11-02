@@ -1,13 +1,15 @@
 import { queries } from "@/entities";
 import { Emotion } from "@/entities/voices/api/schema";
-import { EmotionIconComponent } from "@/shared/lib/emotions/components/EmotionIconComponent";
-import { normalizeEmotion } from "@/shared/lib/emotions/util";
+import { EmotionIconComponent } from "@/shared/lib/emotions/components";
+import { emotionRawColorMap } from "@/shared/lib/emotions/constant";
 import { formatDateRange, formatYearMonth, getWeekOfMonth, getWeekRange } from "@/shared/util/format";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 export const WeeklyStatistics = ({ username }: { username: string }) => {
+    const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
+
     const [currentDate, setCurrentDate] = useState(new Date());
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1;
@@ -33,7 +35,6 @@ export const WeeklyStatistics = ({ username }: { username: string }) => {
         setCurrentDate(newDate);
     };
 
-    // 주차의 각 날짜 계산
     const weekDates: Date[] = [];
     for (let i = 0; i < 7; i++) {
         const date = new Date(weekRange.start);
@@ -41,77 +42,36 @@ export const WeeklyStatistics = ({ username }: { username: string }) => {
         weekDates.push(date);
     }
 
-    // 주간 감정 데이터 (API 응답 구조에 맞게 조정)
-    // 허용 포맷 예) { emotions | data | days }: Array<{ date?: string; day?: number|string; emotion?: string }>
     const weeklyEmotions: (Emotion | null)[] = Array(7).fill(null);
 
-    // API 응답 구조 확인 및 디버깅
-    console.log("=== Weekly Statistics Debug ===");
-    console.log("weeklyData:", JSON.stringify(weeklyData, null, 2));
-    console.log("weekDates:", weekDates.map(d => d.toISOString().split('T')[0]));
+    if (weeklyData?.weekly && Array.isArray(weeklyData.weekly)) {
+        weeklyData.weekly.forEach((item) => {
+            if (!item.date || !item.top_emotion) return;
 
-    const weeklyItems: any[] =
-        (Array.isArray(weeklyData?.emotions) && weeklyData?.emotions) ||
-        (Array.isArray(weeklyData?.data) && weeklyData?.data) ||
-        (Array.isArray(weeklyData?.days) && weeklyData?.days) ||
-        [];
+            // 날짜 문자열로 매칭 ('YYYY-MM-DD' 형식)
+            const itemDate = new Date(item.date);
+            if (isNaN(itemDate.getTime())) return;
 
-    console.log("weeklyItems:", weeklyItems);
-
-    // 데이터가 없으면 테스트 데이터 사용 (개발 중 디버깅용)
-    if (weeklyItems.length === 0) {
-        console.log("No data from API, using test data");
-        // 테스트 데이터: 각 요일에 샘플 감정 할당
-        const testEmotions: Emotion[] = ["happy", "sad", "happy", "calm", "sad", "anxiety", "calm"];
-        testEmotions.forEach((emotion, idx) => {
-            weeklyEmotions[idx] = emotion;
-        });
-    } else {
-        weeklyItems.forEach((item: any) => {
-            let dayIndex = -1;
-
-            // 1) 날짜 문자열로 매칭
-            if (item?.date) {
-                const itemDate = new Date(item.date);
-                if (!isNaN(itemDate as any)) {
-                    dayIndex = weekDates.findIndex(
-                        (d) =>
-                            d.getFullYear() === itemDate.getFullYear() &&
-                            d.getMonth() === itemDate.getMonth() &&
-                            d.getDate() === itemDate.getDate()
-                    );
-                }
-            }
-
-            // 2) 요일 인덱스(0~6) 혹은 1~7을 사용하는 경우
-            if (dayIndex === -1 && typeof item?.day === "number") {
-                if (item.day >= 0 && item.day < 7) dayIndex = item.day;
-                else if (item.day >= 1 && item.day <= 7) dayIndex = item.day - 1;
-            }
-
-            // 3) 요일 문자열("일","월","화"... / "sun","mon"...)
-            if (dayIndex === -1 && typeof item?.day === "string") {
-                const mapKo: Record<string, number> = { 일: 0, 월: 1, 화: 2, 수: 3, 목: 4, 금: 5, 토: 6 };
-                const mapEn: Record<string, number> = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
-                const key = item.day.trim().toLowerCase();
-                if (key in mapKo) dayIndex = mapKo[key];
-                if (key in mapEn) dayIndex = mapEn[key];
-            }
+            const dayIndex = weekDates.findIndex(
+                (d) =>
+                    d.getFullYear() === itemDate.getFullYear() &&
+                    d.getMonth() === itemDate.getMonth() &&
+                    d.getDate() === itemDate.getDate()
+            );
 
             if (dayIndex >= 0 && dayIndex < 7) {
-                const emotion = normalizeEmotion(item?.emotion);
-                console.log(`Mapped dayIndex ${dayIndex}: emotion ${item?.emotion} -> ${emotion}`);
-                if (emotion) weeklyEmotions[dayIndex] = emotion;
+                const emotion = item.top_emotion;
+                if (emotion) {
+                    weeklyEmotions[dayIndex] = emotion;
+                }
             }
         });
     }
 
-    console.log("Final weeklyEmotions:", weeklyEmotions);
-
-    const weeklySummary = weeklyData?.summary || "주 초반에는 즐겁고 안정적인 날들이 많았지만, 목요일부터 감정 상태가 급격히 바뀌었네요.";
+    const weeklySummary = "주 초반에는 즐겁고 안정적인 날들이 많았지만, 목요일부터 감정 상태가 급격히 바뀌었네요.";
 
     // Y축 감정 (위에서 아래로: 즐거움 -> 불안)
-    const yAxisEmotions: Emotion[] = ["happy", "calm", "surprise", "sad", "anxiety", "anger"];
+    const yAxisEmotions: Emotion[] = ["happy", "neutral", "surprise", "sad", "fear", "angry"];
 
     return (
         <View className="bg-white rounded-[20px] p-6 gap-y-4 mb-4">
@@ -160,7 +120,7 @@ export const WeeklyStatistics = ({ username }: { username: string }) => {
                         {yAxisEmotions.map((emotion, index) => (
                             <View
                                 key={emotion}
-                                className="absolute left-0 right-0"
+                                className="absolute le  ft-0 right-0"
                                 style={{
                                     top: `${(index / (yAxisEmotions.length - 1)) * 100}%` as any,
                                     height: 1,
@@ -188,7 +148,7 @@ export const WeeklyStatistics = ({ username }: { username: string }) => {
                             return (
                                 <View key={`${dayIndex}-${date.toISOString()}`} className="flex-1 items-center justify-center relative" style={{ minHeight: 200 }}>
                                     {/* 감정 아이콘 */}
-                                    {emotion && emotion !== "anger" && (
+                                    {emotion && emotion !== "angry" && (
                                         <View
                                             className="absolute items-center justify-center"
                                             style={{
@@ -202,13 +162,13 @@ export const WeeklyStatistics = ({ username }: { username: string }) => {
                                         </View>
                                     )}
                                     {/* 분노 감정은 특별 처리 (현재 아이콘이 없음) */}
-                                    {emotion === "anger" && (
+                                    {emotion === "angry" && (
                                         <View
                                             className="absolute w-5 h-5 rounded-full items-center justify-center"
                                             style={{
                                                 top: yPosition as any,
                                                 transform: [{ translateY: -10 }],
-                                                backgroundColor: emotionColors.anger,
+                                                backgroundColor: emotionRawColorMap.angry,
                                             }}
                                         >
                                             <Text className="text-white text-[10px] font-bold">분</Text>

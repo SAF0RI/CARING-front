@@ -7,7 +7,7 @@ import { EmotionIconComponent } from "./EmotionIconComponent";
 
 export const EmotionComponentWithText = ({
     showAiAnalysisText = false,
-    emotion = 'calm',
+    emotion = 'unknown',
     isBig = false,
     className,
 }: {

@@ -1,8 +1,9 @@
 import { useAudioPlayer } from "@/shared/lib/hooks/useAudioPlayer";
-import { AudioControlButton, Button, EmotionComponent, Footer, HelpButton, MainHeader, MainLayout } from "@/shared/ui";
+import { AudioControlButton, Button, Footer, HelpButton, MainHeader, MainLayout } from "@/shared/ui";
 
 import { queries } from "@/entities";
 import { VoiceListItem } from "@/entities/voices/api/schema";
+import { EmotionComponentWithText } from "@/shared/lib/emotions/components";
 import { formatDate } from "@/shared/util/format";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -26,7 +27,7 @@ const DiaryListCard = ({ diary, isPlaying, isBuffering = false, onPress }: Diary
                 <Text className="text-gray90 text-[15px] font-semibold">{formatDate(diary.created_at)}</Text>
             </View>
             <View className="self-start">
-                <EmotionComponent emotion={diary.emotion ?? 'unknown'} isBig={false} />
+                <EmotionComponentWithText emotion={diary.emotion ?? 'unknown'} isBig={false} />
             </View>
             <Text className="text-main900 text-[15px] font-semibold mb-1 px-1">{diary?.question_title ?? '오늘 주변에서 본 것 중 가장 보기 좋았던 풍경은 무엇인가요?'}</Text>
             <Text

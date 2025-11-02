@@ -24,7 +24,7 @@ const DiaryListCard = ({ diary, onPress }: DiaryListCardProps) => {
                 <Text className="text-gray90 text-[15px] font-semibold">{formatDate(diary.created_at)}</Text>
             </View>
             <View className="flex flex-row items-center justify-start">
-                <Icon name="anxiety" size={24} />
+                <Icon name="fear" size={24} />
                 <View className="flex-1 ml-2">
                     <Text className="text-gray90 text-[15px] ">{'홍길동 님은'}</Text>
                     <Text className="text-gray90 text-[15px] font-semibold">{`${diary.emotion} 상태에요!`}</Text>

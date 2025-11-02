@@ -5,16 +5,18 @@ export const EmotionIconComponent = ({ emotion, isBig }: { emotion: Emotion, isB
     switch (emotion) {
         case "unknown":
             return <Icon name="Spinner" size={isBig ? 40 : 20} />;
-        case "anxiety":
-            return <Icon name={isBig ? "anxietyBig" : "anxiety"} size={isBig ? 40 : 20} />;
-        case "calm":
-            return <Icon name={isBig ? "calmBig" : "calm"} size={isBig ? 40 : 20} />;
+        case "fear":
+            return <Icon name="fear" size={isBig ? 40 : 20} />;
+        case "neutral":
+            return <Icon name="neutral" size={isBig ? 40 : 20} />;
+        case "angry":
+            return <Icon name="angry" size={isBig ? 40 : 20} />;
         case "happy":
-            return <Icon name={isBig ? "happyBig" : "happy"} size={isBig ? 40 : 20} />;
+            return <Icon name="happy" size={isBig ? 40 : 20} />;
         case "sad":
-            return <Icon name={isBig ? "sadBig" : "sad"} size={isBig ? 40 : 20} />;
+            return <Icon name="sad" size={isBig ? 40 : 20} />;
         case "surprise":
-            return <Icon name="Surprise" size={isBig ? 40 : 20} />;
+            return <Icon name="surprise" size={isBig ? 40 : 20} />;
         default:
             return null;
     }

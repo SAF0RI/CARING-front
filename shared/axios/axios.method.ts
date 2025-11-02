@@ -1,6 +1,24 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { Platform } from "react-native";
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
+// 안드로이드 에뮬레이터에서 localhost/127.0.0.1은 10.0.2.2로 변환
+const getBaseUrl = () => {
+  const baseUrl = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
+
+  // 안드로이드이고 localhost 또는 127.0.0.1을 사용하는 경우 10.0.2.2로 변환
+  if (Platform.OS === "android") {
+    if (baseUrl.includes("localhost")) {
+      return baseUrl.replace("localhost", "10.0.2.2");
+    }
+    if (baseUrl.includes("127.0.0.1")) {
+      return baseUrl.replace("127.0.0.1", "10.0.2.2");
+    }
+  }
+
+  return baseUrl;
+};
+
+const BASE_URL = getBaseUrl();
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: BASE_URL,

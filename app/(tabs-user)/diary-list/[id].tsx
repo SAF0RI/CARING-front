@@ -1,7 +1,8 @@
 import { queries } from "@/entities";
 import { deleteUserVoice } from "@/entities/voices/api/handler";
+import { EmotionComponentWithText } from "@/shared/lib/emotions/components";
 import { useAudioPlayer } from "@/shared/lib/hooks/useAudioPlayer";
-import { AudioControlButton, AudioProgress, BackHeader, Button, EmotionComponent, HelpButton, Icon, MainLayout } from "@/shared/ui";
+import { AudioControlButton, AudioProgress, BackHeader, Button, HelpButton, Icon, MainLayout } from "@/shared/ui";
 import { formatDate } from "@/shared/util/format";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
@@ -70,7 +71,7 @@ export default function DiaryDetailScreen() {
                     <Text className="text-gray90 text-[15px] font-semibold w-full text-center">
                         {currentDiary?.created_at ? formatDate(currentDiary.created_at) : '-'}
                     </Text>
-                    <EmotionComponent
+                    <EmotionComponentWithText
                         className="self-center"
                         emotion={currentDiary?.top_emotion ?? 'unknown'} isBig={false} showAiAnalysisText={true} />
                     <Text className="text-main900 text-[19px] font-bold">

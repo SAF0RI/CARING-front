@@ -136,14 +136,12 @@ export { default as Play } from "./audio/ic_play.svg";
 export { default as Stop } from "./audio/ic_stop.svg";
 
 // emotion icon
-export { default as anxiety } from "./emotions/ic_anxiety.svg";
-export { default as anxietyBig } from "./emotions/ic_anxiety_big.svg";
-export { default as calm } from "./emotions/ic_calm.svg";
-export { default as calmBig } from "./emotions/ic_calm_big.svg";
+export { default as angry } from "./emotions/ic_angry.svg";
+export { default as fear } from "./emotions/ic_fear.svg";
 export { default as happy } from "./emotions/ic_happy.svg";
-export { default as happyBig } from "./emotions/ic_happy_big.svg";
+export { default as neutral } from "./emotions/ic_neutral.svg";
 export { default as sad } from "./emotions/ic_sad.svg";
-export { default as sadBig } from "./emotions/ic_sad_big.svg";
+export { default as surprise } from "./emotions/ic_surprise.svg";
 
 // footer icon
 export { default as FooterLogo } from "./footer/ic_logo_footer.svg";

@@ -1,3 +1,4 @@
+import { Emotion } from "@/entities/voices/api/schema";
 export interface CareVoiceListItem {
   voice_id: number;
   created_at: string;
@@ -14,17 +15,13 @@ export interface MonthlyFrequencyRequest {
   month: string; // e.g. 2025-10
 }
 
+type Optional<T> = {
+  [K in keyof T]?: T[K];
+};
+
 export interface MonthlyFrequencyResponse {
   success: boolean;
-  frequency: {
-    unknown?: number;
-    happy?: number;
-    calm?: number;
-    surprise?: number;
-    sad?: number;
-    anxiety?: number;
-    angry?: number; // API에서는 "angry"로 오지만 코드에서는 "anger"로 사용
-  };
+  frequency: Optional<Record<Emotion, number>>;
 }
 
 export interface WeeklySummaryRequest {
@@ -33,4 +30,11 @@ export interface WeeklySummaryRequest {
   week: number; // 1..5
 }
 
-export type WeeklySummaryResponse = Record<string, any>;
+export interface WeeklySummaryResponse {
+  weekly: {
+    // 'YYYY-MM-DD'
+    date: string;
+    weekday: "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun";
+    top_emotion: Emotion;
+  }[];
+}
