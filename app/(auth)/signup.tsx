@@ -15,7 +15,7 @@ export default function SignupScreen() {
     const router = useRouter();
     const { control, handleSubmit, trigger, setValue } = useForm<SignUpRequest & { confirmPassword: string }>({
         defaultValues: {
-            name: "박준혁",
+            name: "",
             birthdate: "2000.05.06",
             username: "",
             password: "",
@@ -89,6 +89,13 @@ export default function SignupScreen() {
                             <Text className="font-bold text-2xl">입력해주세요.</Text>
                         </View>
                         <View className="flex-1 items-center justify-start gap-y-4 mx-4 mt-8">
+                            <InfoInput
+                                name="name"
+                                control={control}
+                                placeholder="이름"
+                                secureTextEntry={false}
+                                label="이름"
+                            />
                             <InfoInput
                                 name="username"
                                 control={control}
