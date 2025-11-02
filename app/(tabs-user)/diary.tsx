@@ -1,7 +1,7 @@
 import { queries } from '@/entities/index';
 import { getLocalUserInfo } from "@/entities/user/api/storage";
 import { UploadVoiceWithQuestionRequest, uploadVoiceWithQuestion } from "@/entities/voices/api";
-import { Button, HelpButton, Icon, MainHeader, MainLayout, RecordingTimer, SpeechBubble } from "@/shared/ui";
+import { Button, HelpButton, Icon, MainHeader, MainLayout, RecordingTimer, SpeechBubble, WaveformVisualizer } from "@/shared/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     RecordingPresets,
@@ -17,7 +17,7 @@ import { ActivityIndicator, Alert, RefreshControl, ScrollView, Text, TouchableOp
 const bubbleText = {
     play: "이 버튼을 누르면\n제가 귀 기울여 들을게요!",
     recording: "듣고 있어요!\n눌러서 멈출 수 있어요",
-    paused: "녹음 완료!\n저장하거나 이어서 녹음하거나 완료할 수 있어요",
+    paused: "저장하거나 이어서 녹음하거나 완료할 수 있어요",
 };
 
 export default function DiaryScreen() {
@@ -65,6 +65,23 @@ export default function DiaryScreen() {
     const stopRecording = async () => {
         await audioRecorder.stop();
         setCurrentBubbleText(bubbleText.play);
+    };
+
+    const handleReset = async () => {
+        try {
+            // 녹음 중이면 먼저 중지
+            if (recordingState.isRecording) {
+                await audioRecorder.stop();
+            }
+            // uri가 있으면 완전히 초기화하기 위해 stop 호출 후 새로운 녹음 세션 준비
+            if (audioRecorder.uri) {
+                await audioRecorder.stop();
+                await audioRecorder.prepareToRecordAsync();
+            }
+            setCurrentBubbleText(bubbleText.play);
+        } catch (error) {
+            console.error('리셋 중 오류 발생:', error);
+        }
     };
 
     const handleMainButtonPress = async () => {
@@ -180,13 +197,12 @@ export default function DiaryScreen() {
 
                 <View className="w-full mt-8 px-5">
                     {/* 녹음 파형 및 타이머 컴포넌트 */}
-                    <View className="flex flex-row items-center justify-center h-[60px] bg-gray10 rounded-[20px] w-full">
-                        {/* <WaveformVisualizer
-                        audioLevel={audioLevel}
-                        isRecording={isRecording}
-                        isPaused={isPaused}
-                        waveformData={waveformData}
-                    /> */}
+                    <View className="flex flex-row items-center justify-center h-[60px] bg-gray10 rounded-[20px] w-full gap-x-3">
+                        <WaveformVisualizer
+                            isRecording={recordingState.isRecording}
+                            isPaused={!recordingState.isRecording && recordingState.durationMillis > 0}
+                            durationMillis={recordingState.durationMillis}
+                        />
                         <RecordingTimer
                             duration={recordingState.durationMillis / 1000}
                             isRecording={recordingState.isRecording}
@@ -196,6 +212,15 @@ export default function DiaryScreen() {
                 </View>
 
                 <View className="flex-row items-center justify-center px-4 mt-10 relative w-full">
+                    {
+                        !recordingState.isRecording && recordingState.durationMillis > 0 && !isSaving && (
+                            <View className="absolute left-8">
+                                <Button size="lg" variant="outlined" onPress={handleReset}>
+                                    <Text className="text-gray90 text-[15px] font-bold px-5">취소하기</Text>
+                                </Button>
+                            </View>
+                        )
+                    }
                     {/* 녹음 조정 버튼 - 항상 가운데 */}
                     <TouchableOpacity
                         className={`w-[88px] h-[88px] rounded-full flex items-center justify-center bg-main500 ${recordingState.isRecording ? 'bg-main700' : ''}`}
@@ -208,15 +233,11 @@ export default function DiaryScreen() {
                         />
                     </TouchableOpacity>
 
-                    {/* 저장하기 버튼 - 우측에 위치 */}
                     {
                         !recordingState.isRecording && recordingState.durationMillis > 0 && !isSaving && (
-                            <View className="absolute right-8">
+                            <View className="absolute right-8 flex-row gap-x-2">
                                 <Button size="lg" variant="filled" onPress={handleSaveServer}>
-                                    {
-                                        isSaving ? <ActivityIndicator size="small" color="white" /> :
-                                            <Text className="text-white text-[15px] font-bold px-5">저장하기</Text>
-                                    }
+                                    <Text className="text-white text-[15px] font-bold px-5">저장하기</Text>
                                 </Button>
                             </View>
                         )
@@ -233,7 +254,7 @@ export default function DiaryScreen() {
                     }
                 </View>
                 <View className="flex items-center justify-center w-full h-fit">
-                    <SpeechBubble className="h-fit w-2/3 px-5 flex items-center justify-center">
+                    <SpeechBubble className="h-fit w-3/4 px-0 flex items-center justify-center">
                         <Text className="text-gray-800 text-base text-center">
                             {currentBubbleText}
                         </Text>
