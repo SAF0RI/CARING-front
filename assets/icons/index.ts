@@ -158,3 +158,5 @@ export { default as Surprise } from "./emotions/ic_surprise.svg";
 export { default as ConnectIcon } from "./ic_connect.svg";
 
 export { default as UserEmptyIcon } from "./img_user_empty.svg";
+
+export { default as CalendarIcon } from "./ic_calendar.svg";

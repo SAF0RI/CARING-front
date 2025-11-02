@@ -1,12 +1,14 @@
-import { HelpButton, Icon, MainHeader, MainLayout } from "@/shared/ui";
+import { Button, Icon, MainHeader, MainLayout } from "@/shared/ui";
 
 import { queries } from "@/entities";
 import { CareVoiceListItem } from "@/entities/care/api/schema";
 import { emotionKorMap } from "@/shared/lib/emotions";
 import { formatDate } from "@/shared/util/format";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, FlatList, Platform, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 
 type DiaryListCardProps = {
     diary: CareVoiceListItem;
@@ -46,7 +48,35 @@ export default function DiaryListScreen() {
         enabled: !!userInfo?.username,
     });
 
-    console.log({ diaries: diaries?.voices });
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+
+    const handleDateChange = (event: any, date?: Date) => {
+        if (Platform.OS === 'android') {
+            setShowDatePicker(false);
+            if (event.type === 'dismissed') {
+                return;
+            }
+        }
+        if (Platform.OS === 'ios') {
+            if (event.type === 'dismissed') {
+                setShowDatePicker(false);
+                return;
+            }
+        }
+        if (date) {
+            setSelectedDate(date);
+            // 선택된 날짜에 대한 처리 로직 추가 가능
+            console.log('Selected date:', date);
+            if (Platform.OS === 'ios') {
+                setShowDatePicker(false);
+            }
+        }
+    };
+
+    const handleCalendarPress = () => {
+        setShowDatePicker(true);
+    };
 
     const renderDiaryCard = ({ item }: { item: CareVoiceListItem }) => {
         return (
@@ -63,8 +93,27 @@ export default function DiaryListScreen() {
             <MainLayout.Header>
                 <MainHeader
                     title="일기 리스트"
-                    rightComponent={<HelpButton />}
+                    rightComponent={
+                        <Button
+                            size="md"
+                            variant="text"
+                            className="self-end"
+                            layoutClassName="w-fit"
+                            onPress={handleCalendarPress}
+                        >
+                            <Icon name="CalendarIcon" size={24} />
+                        </Button>
+                    }
                 />
+                {showDatePicker && (
+                    <DateTimePicker
+                        value={selectedDate}
+                        mode="date"
+                        display={Platform.OS === 'ios' ? 'default' : 'default'}
+                        onChange={handleDateChange}
+                        maximumDate={new Date()}
+                    />
+                )}
             </MainLayout.Header>
             <MainLayout.Content className="bg-gray5 flex-1 p-0" footer={false}>
                 {false ? (
@@ -74,7 +123,7 @@ export default function DiaryListScreen() {
                     </View>
                 ) : (
                     <FlatList
-                        data={Array.from({ length: 10 }, () => diaries?.voices ?? []).flat()}
+                        data={diaries?.voices ?? []}
                         refreshControl={<RefreshControl refreshing={isFetching} onRefresh={() => { refetch() }} />}
                         renderItem={renderDiaryCard}
                         ItemSeparatorComponent={() => <View className="h-5" />}
