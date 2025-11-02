@@ -48,11 +48,9 @@ export const useAudioPlayer = (options?: UseAudioPlayerOptions) => {
       if (status.playing) {
         await player.pause();
       } else {
-        // 일시정지 상태면 재개, 아니면 처음부터 재생
         if (status.isLoaded && !status.didJustFinish) {
           await player.play();
         } else {
-          // 재생이 끝난 상태면 처음부터 다시 재생
           await player.seekTo(0);
           await player.play();
         }
