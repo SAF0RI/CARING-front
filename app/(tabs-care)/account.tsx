@@ -1,10 +1,11 @@
 import { queries } from "@/entities";
 import { removeLocalUserInfo } from "@/entities/user/api/storage";
+import { deactivateFcmTokenFromServer } from "@/shared/lib/fcm/token-management";
 import { Button, Icon, MainHeader, MainLayout } from "@/shared/ui";
 import { cn } from "@/shared/util/style";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Text, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 
 export default function AccountScreen(
 
@@ -39,6 +40,15 @@ export default function AccountScreen(
                         <Text className="text-gray90 text-[19px]">{userPageInfo?.data?.username}</Text>
                     </View>
                     <Button onPress={async () => {
+                        try {
+                            if (userInfo?.data?.username) {
+                                await deactivateFcmTokenFromServer(userInfo.data.username);
+                            }
+                        } catch (error) {
+                            console.error("FCM 토큰 비활성화 실패:", error);
+                            Alert.alert("FCM 토큰 비활성화 실패", "다시 시도해주세요.");
+                        }
+
                         await removeLocalUserInfo();
                         router.replace("/login");
                     }} size="md" variant="text" className="self-start mt-4">

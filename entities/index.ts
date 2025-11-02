@@ -2,6 +2,7 @@ import { mergeQueryKeys } from "@lukemorales/query-key-factory";
 
 import { adminQueries } from "./admin/api";
 import { careQueries } from "./care/api";
+import { fcmQueries } from "./fcm/api";
 import { nlpQueries } from "./nlp/api";
 import { questionsQueries } from "./questions/api";
 import { systemQueries } from "./system/api";
@@ -17,7 +18,8 @@ export const queries = mergeQueryKeys(
   nlpQueries,
   questionsQueries,
   systemQueries,
-  testQueries
+  testQueries,
+  fcmQueries
 );
 
 export const matchMultiQueries = (queryKeys: readonly any[]) => {

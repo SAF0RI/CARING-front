@@ -2,6 +2,7 @@ import { queries } from "@/entities";
 import { signIn } from "@/entities/user/api";
 import { Role, UserInfo } from "@/entities/user/api/schema";
 import { setLocalUserInfo } from "@/entities/user/api/storage";
+import { registerFcmTokenToServer } from "@/shared/lib/fcm/token-management";
 import { Button } from "@/shared/ui/buttons";
 import { LoginInput } from "@/shared/ui/input";
 import { Icon } from "@/shared/ui/svg";
@@ -42,9 +43,14 @@ export default function LoginScreen() {
             };
 
             await setLocalUserInfo(userInfo);
-            
-            // React Query 캐시에 userInfo 업데이트
+
             queryClient.setQueryData(queries.user.userInfo.queryKey, userInfo);
+
+            try {
+                await registerFcmTokenToServer(data.username);
+            } catch (error) {
+                console.error("FCM 토큰 등록 실패:", error);
+            }
 
             if (data.role === Role.CARE) {
                 router.replace("/(tabs-care)/home");
