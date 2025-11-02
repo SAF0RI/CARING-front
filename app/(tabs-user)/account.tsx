@@ -1,14 +1,15 @@
 import { queries } from "@/entities";
+import { removeLocalUserInfo } from "@/entities/user/api/storage";
 import { Button, HelpButton, Icon, MainHeader, MainLayout } from "@/shared/ui";
 import { cn } from "@/shared/util/style";
 import { useQuery } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
+import { useRouter } from "expo-router";
 import { Alert, Text, View } from "react-native";
 
 export default function AccountScreen() {
     const userInfo = useQuery(queries.user.userInfo);
-
-    console.log(userInfo.data);
+    const router = useRouter();
 
     const userPageInfo = useQuery({
         ...queries.user.userPageInfo(userInfo?.data?.username ?? ""),
@@ -52,6 +53,12 @@ export default function AccountScreen() {
                             <Text className="text-main900 text-[15px] mx-4">복사하기</Text>
                         </Button>
                     </View>
+                    <Button onPress={async () => {
+                        await removeLocalUserInfo();
+                        router.replace("/login");
+                    }} size="md" variant="text" className="self-start mt-4">
+                        <Text className="text-gray50">로그아웃하기</Text>
+                    </Button>
                 </View>
             </MainLayout.Content>
         </MainLayout >
