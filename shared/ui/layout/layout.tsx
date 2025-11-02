@@ -21,7 +21,7 @@ export const LayoutContent = ({ children, className, footer = true, isScrollable
     return (
         <>
             {isScrollable ?
-                <ScrollView className="flex-1 w-full">
+                <ScrollView className={cn("flex-1 w-full", className)} {...props}>
                     {children}
                     {footer && <Footer />}
                 </ScrollView>
