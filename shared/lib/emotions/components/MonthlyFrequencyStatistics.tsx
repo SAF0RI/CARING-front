@@ -105,7 +105,7 @@ export const MonthlyFrequencyStatistics = ({ username, isReport = true }: { user
 
                 <View className="items-center flex-1">
                     <Text className="text-gray90 text-[20px] font-bold">
-                        `${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`
+                        {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
                     </Text>
                 </View>
 
