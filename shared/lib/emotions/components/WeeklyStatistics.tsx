@@ -158,7 +158,7 @@ export const WeeklyStatistics = ({ username, role = Role.CARE, isReport = true }
                                             transform: [{ translateY: -10 }],
                                         }}
                                     >
-                                        불안
+                                        분노
                                     </Text>
                                 </View>
                             );
