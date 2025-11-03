@@ -95,6 +95,7 @@ export default function SignupScreen() {
                                 placeholder="이름"
                                 secureTextEntry={false}
                                 label="이름"
+                                keyboardType="default"
                             />
                             <InfoInput
                                 name="username"
@@ -102,6 +103,7 @@ export default function SignupScreen() {
                                 placeholder="아이디"
                                 secureTextEntry={false}
                                 label="아이디"
+                                keyboardType="default"
                             />
                             <InfoInput
                                 name="password"
@@ -110,6 +112,7 @@ export default function SignupScreen() {
                                 secureTextEntry={true}
                                 label="비밀번호"
                                 sublabel="비밀번호를 입력해주세요."
+                                keyboardType="default"
                             />
                             <InfoInput
                                 name="confirmPassword"
@@ -118,6 +121,7 @@ export default function SignupScreen() {
                                 secureTextEntry={true}
                                 label="비밀번호 확인"
                                 sublabel="비밀번호를 다시 입력해주세요."
+                                keyboardType="default"
                             />
                         </View>
                         <Button
@@ -167,6 +171,7 @@ export default function SignupScreen() {
                                     secureTextEntry={false}
                                     label="피보호자 닉네임 검색"
                                     sublabel="피보호자의 내 정보에서 아이디를 확인해주세요."
+                                    keyboardType="default"
                                 />
                             )}
                         </View>

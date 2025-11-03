@@ -1,10 +1,11 @@
 import { Control, Controller, RegisterOptions } from 'react-hook-form';
 import { StyleProp, Text, TextInput, View, ViewStyle } from 'react-native';
 
-interface LoginInputProps {
+interface InfoInputProps {
     placeholder: string;
     value: string;
     secureTextEntry?: boolean;
+    keyboardType?: 'default' | 'number-pad' | 'decimal-pad' | 'numeric' | 'email-address' | 'phone-pad';
     handleInput: (text: string) => void;
     label?: string;
     sublabel?: string;
@@ -24,7 +25,8 @@ const InfoInputInner = ({
     error,
     style = {},
     children,
-}: LoginInputProps) => {
+    keyboardType = 'default',
+}: InfoInputProps) => {
     return (
         <View className="flex justify-start items-start w-full relative" style={style}>
             {label && <Text className="text-xl text-gray100 mb-2">{label}</Text>}
@@ -39,7 +41,7 @@ const InfoInputInner = ({
                         secureTextEntry={secureTextEntry}
                         value={value}
                         onChangeText={handleInput}
-                        keyboardType="number-pad"
+                        keyboardType={keyboardType}
                     />)
             }
 
@@ -51,7 +53,7 @@ const InfoInputInner = ({
         </View>
     );
 };
-type RHFInfoInputProps = Omit<LoginInputProps, 'value' | 'handleInput' | 'error'> & {
+type RHFInfoInputProps = Omit<InfoInputProps, 'value' | 'handleInput' | 'error'> & {
     name: string;
     control: Control<any>;
     rules?: RegisterOptions;
