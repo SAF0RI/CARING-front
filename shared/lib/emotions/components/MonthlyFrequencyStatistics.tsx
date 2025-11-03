@@ -141,8 +141,8 @@ export const MonthlyFrequencyStatistics = ({ username, role = Role.CARE, isRepor
             ) : (
                 <View className="h-64">
                     {/* Y축 */}
-                    <View className="absolute left-0 top-0 bottom-8 justify-between">
-                        {yAxisTicks.map((tick) => (
+                    <View className="absolute left-0 top-0 -bottom-1 justify-between">
+                        {[...yAxisTicks].slice().reverse().map((tick) => (
                             <Text key={tick} className="text-gray70 text-[12px]">
                                 {tick}
                             </Text>

@@ -52,11 +52,8 @@ export const WeeklyStatistics = ({ username, role = Role.CARE, isReport = true }
         setCurrentDate(newDate);
     };
 
-    // 요일 고정 순서: 일(0) ~ 토(6)
     const weekdaysOrder: number[] = [0, 1, 2, 3, 4, 5, 6];
 
-    // 새로운 API 응답 구조에 맞춰 감정 데이터 매핑
-    // WeeklySummaryResponse: { weekly: [{ date: string, weekday: string, top_emotion: Emotion }] }
     const weeklyEmotions: (Emotion | null)[] = Array(7).fill(null);
 
     if (weeklyData?.weekly && Array.isArray(weeklyData.weekly)) {
@@ -75,7 +72,7 @@ export const WeeklyStatistics = ({ username, role = Role.CARE, isReport = true }
         });
     }
 
-    const weeklySummary = isFetching ? "주간 마음일기 통계를 불러오는 중입니다." : "주 초반에는 즐겁고 안정적인 날들이 많았지만, 목요일부터 감정 상태가 급격히 바뀌었네요.";
+    const weeklySummary = isFetching ? "주간 마음일기 통계를 불러오는 중입니다." : undefined;
 
     const yAxisEmotions: Emotion[] = ["happy", "neutral", "surprise", "sad", "fear", "angry"];
     // 고정 높이 기반 레이아웃: h-64(=256), 하단 날짜 영역(외부 pb-8 32 + 내부 paddingBottom 32)
@@ -126,7 +123,7 @@ export const WeeklyStatistics = ({ username, role = Role.CARE, isReport = true }
                 </View>
             ) : (
                 <View className="h-64 relative pb-8">
-                    <View className="flex-1 ml-12 mr-4 flex-row items-stretch relative gap-x-2" style={{ paddingBottom: 32 }}>
+                    <View className="flex-1 ml-12 mr-4 flex-row items-stretch relative gap-x-3" style={{ paddingBottom: 32 }}>
                         {(() => {
                             const paddingBottomRatio = (TOTAL_BOTTOM_PADDING) / CONTAINER_HEIGHT;
                             const availableHeight = 100 - (paddingBottomRatio * 100);
@@ -188,21 +185,22 @@ export const WeeklyStatistics = ({ username, role = Role.CARE, isReport = true }
 
                             return (
                                 <View key={`col-${dayOfWeek}`} className="flex-1 items-center justify-center relative" style={{ minHeight: 200 }}>
-                                    <View className="absolute bottom-0">
-                                        <Text className="text-gray70 text-[12px] text-center">
+                                    <View className={`absolute  ${isToday ? "flex-col items-center justify-center -bottom-4" : "bottom-0"}`}>
+                                        <Text className={`text-gray70 text-[12px] text-center ${isToday ? "text-main700 font-bold" : ""}`}>
                                             {dayName}
-                                            {isToday && (
-                                                <Text className="text-main700 text-[10px]">{"\n"}(오늘)</Text>
-                                            )}
                                         </Text>
+                                        {isToday && (
+                                            <Text className="text-main700 text-[10px]"> (오늘)</Text>
+                                        )}
                                     </View>
+
                                 </View>
                             );
                         })}
 
                         {/* 아이콘 오버레이: 가이드선과 동일 좌표계에서 렌더링 (하단 32px 내부 패딩 제외) */}
                         <View className="absolute left-0 right-0" style={{ top: 0, bottom: INNER_BOTTOM_PADDING }}>
-                            <View className="flex-1 ml-12 mr-4 flex-row items-stretch relative gap-x-2">
+                            <View className="flex-1 ml-4 mr-4 flex-row items-stretch relative gap-x-11">
                                 {weekdaysOrder.map((dayOfWeek) => {
                                     const emotion = weeklyEmotions[dayOfWeek];
                                     const emotionIndex = emotion ? yAxisEmotions.indexOf(emotion) : -1;
@@ -241,9 +239,11 @@ export const WeeklyStatistics = ({ username, role = Role.CARE, isReport = true }
                 </View>
             )}
 
-            <View className="bg-gray10 rounded-[16px] p-4 mt-2">
-                <Text className="text-gray70 text-[14px] leading-5">{weeklySummary}</Text>
-            </View>
+            {weeklySummary ? (
+                <View className="bg-gray10 rounded-[16px] p-4 mt-2">
+                    <Text className="text-gray70 text-[14px] leading-5">{weeklySummary}</Text>
+                </View>
+            ) : null}
         </View>
     );
 }
