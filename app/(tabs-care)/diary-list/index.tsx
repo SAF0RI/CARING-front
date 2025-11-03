@@ -1,8 +1,9 @@
 import { Button, Icon, MainHeader, MainLayout } from "@/shared/ui";
 
 import { queries } from "@/entities";
-import { CareVoiceListItem } from "@/entities/care/api/schema";
+import { CareVoiceListItem, TopEmotionResponse } from "@/entities/care/api/schema";
 import { emotionKorMap } from "@/shared/lib/emotions";
+import { EmotionIconComponent } from "@/shared/lib/emotions/components";
 import { formatDate } from "@/shared/util/format";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
@@ -12,10 +13,11 @@ import { ActivityIndicator, FlatList, Platform, RefreshControl, Text, TouchableO
 
 type DiaryListCardProps = {
     diary: CareVoiceListItem;
+    topEmotion: TopEmotionResponse;
     onPress: () => void;
 }
 
-const DiaryListCard = ({ diary }: DiaryListCardProps) => {
+const DiaryListCard = ({ diary, topEmotion }: DiaryListCardProps) => {
 
     return (
         <TouchableOpacity
@@ -26,9 +28,9 @@ const DiaryListCard = ({ diary }: DiaryListCardProps) => {
                 <Text className="text-gray90 text-[15px] font-semibold">{formatDate(diary.created_at)}</Text>
             </View>
             <View className="flex flex-row items-center justify-start">
-                <Icon name="fear" size={24} />
+                <EmotionIconComponent emotion={diary.emotion ?? 'unknown'} isBig={true} />
                 <View className="flex-1 ml-2">
-                    <Text className="text-gray90 text-[15px] ">{'홍길동 님은'}</Text>
+                    <Text className="text-gray90 text-[15px] ">{`${topEmotion?.user_name ?? ''} 님은`}</Text>
                     <Text className="text-gray90 text-[15px] font-semibold">{`${emotionKorMap[diary.emotion ?? 'unknown']} 상태에요!`}</Text>
                 </View>
                 <Icon name="ChevronRightBlack" size={24} />
@@ -43,13 +45,18 @@ export default function DiaryListScreen() {
 
     const { data: userInfo } = useQuery(queries.user.userInfo);
 
-    const { data: diaries, refetch, isFetching } = useQuery({
-        ...queries.care.careUserVoiceList(userInfo?.username ?? ''),
+    const { data: topEmotion } = useQuery({
+        ...queries.care.topEmotion(userInfo?.username ?? ''),
         enabled: !!userInfo?.username,
     });
 
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+    const { data: diaries, refetch, isFetching } = useQuery({
+        ...queries.care.careUserVoiceList(userInfo?.username ?? '', selectedDate),
+        enabled: !!userInfo?.username,
+    });
 
     const handleDateChange = (event: any, date?: Date) => {
         if (Platform.OS === 'android') {
@@ -66,8 +73,6 @@ export default function DiaryListScreen() {
         }
         if (date) {
             setSelectedDate(date);
-            // 선택된 날짜에 대한 처리 로직 추가 가능
-            console.log('Selected date:', date);
             if (Platform.OS === 'ios') {
                 setShowDatePicker(false);
             }
@@ -78,10 +83,11 @@ export default function DiaryListScreen() {
         setShowDatePicker(true);
     };
 
-    const renderDiaryCard = ({ item }: { item: CareVoiceListItem }) => {
+    const renderDiaryCard = ({ item, topEmotion }: { item: CareVoiceListItem, topEmotion: TopEmotionResponse }) => {
         return (
             <DiaryListCard
                 diary={item}
+                topEmotion={topEmotion}
                 onPress={() => router.push(`/diary-list/${item.voice_id}`)}
             />
         );
@@ -125,14 +131,17 @@ export default function DiaryListScreen() {
                     <FlatList
                         data={diaries?.voices ?? []}
                         refreshControl={<RefreshControl refreshing={isFetching} onRefresh={() => { refetch() }} />}
-                        renderItem={renderDiaryCard}
+                        renderItem={({ item }) => renderDiaryCard({ item, topEmotion: topEmotion ?? { date: '', user_name: '', top_emotion: 'unknown' } })}
                         ItemSeparatorComponent={() => <View className="h-5" />}
                         keyExtractor={(item, index) => `${item.voice_id}-${index}`}
                         contentContainerStyle={{ flexGrow: 1, marginTop: 20 }}
                         contentContainerClassName="gap-y-1"
                         showsVerticalScrollIndicator={false}
                         scrollEnabled
-                        ListFooterComponent={() => <View className="h-20" />}
+                        // 현재 날짜 표시
+                        ListHeaderComponent={() => <View className="pl-4 pb-2">
+                            <Text className="text-gray90 text-[19px] font-semibold">{formatDate(selectedDate.toISOString())}</Text>
+                        </View>}
                         ListEmptyComponent={
                             <View className="flex-1 justify-center items-center">
                                 <Text className="text-gray70 text-center text-lg">

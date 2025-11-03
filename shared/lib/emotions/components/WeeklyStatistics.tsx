@@ -72,7 +72,7 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
         });
     }
 
-    const weeklySummary = "주 초반에는 즐겁고 안정적인 날들이 많았지만, 목요일부터 감정 상태가 급격히 바뀌었네요.";
+    const weeklySummary = isLoading ? "주간 마음일기 통계를 불러오는 중입니다." : "주 초반에는 즐겁고 안정적인 날들이 많았지만, 목요일부터 감정 상태가 급격히 바뀌었네요.";
 
     const yAxisEmotions: Emotion[] = ["happy", "neutral", "surprise", "sad", "fear", "angry"];
 

@@ -4,8 +4,11 @@ import { Role } from "@/entities/user/api/schema";
 import { getLocalUserInfo } from "@/entities/user/api/storage";
 import { FcmProvider } from '@/shared/lib/fcm';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { isAxiosError } from "axios";
 import { Redirect, Slot, useRootNavigationState, useSegments } from "expo-router";
 import { useEffect, useMemo, useState } from 'react';
+import { Alert } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../index.css";
 
 export default function RootLayout() {
@@ -31,6 +34,11 @@ export default function RootLayout() {
           console.log("[RQ][Mutation][Response]", { data, variables });
         },
         onError: (error, variables) => {
+          if (isAxiosError(error)) {
+            Alert.alert("오류", error.response?.data?.error);
+          } else {
+            Alert.alert("오류", error.message);
+          }
           console.log("[RQ][Mutation][Error]", { error, variables });
         },
       },
@@ -68,10 +76,12 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <FcmProvider>
-        <Slot />
-      </FcmProvider>
-    </QueryClientProvider >
+    <SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <FcmProvider>
+          <Slot />
+        </FcmProvider>
+      </QueryClientProvider >
+    </SafeAreaProvider>
   );
 }

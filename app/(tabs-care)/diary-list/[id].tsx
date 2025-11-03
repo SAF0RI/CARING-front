@@ -2,10 +2,10 @@ import { queries } from "@/entities";
 import { Emotion } from "@/entities/voices/api/schema";
 import { emotionCharacteristics as emotionCharacteristicsMap, emotionKorMap, emotionRawColorMap } from "@/shared/lib/emotions";
 import { EmotionIconComponent } from "@/shared/lib/emotions/components";
-import { BackHeader, HelpButton, MainLayout } from "@/shared/ui";
+import { BackHeader, MainLayout } from "@/shared/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { Text, View } from "react-native";
+import { RefreshControl, Text, View } from "react-native";
 
 const formatDateSimple = (isoString: string) => {
     const date = new Date(isoString);
@@ -20,7 +20,7 @@ export default function DiaryDetailScreen() {
 
     console.log({ userInfo });
 
-    const { data: diary } = useQuery({
+    const { data: diary, refetch, isFetching, isRefetching } = useQuery({
         ...queries.voices.voiceAnalyzePreview(Number(id), userInfo?.username ?? ''),
         enabled: !!id && !!userInfo?.username,
     });
@@ -45,10 +45,19 @@ export default function DiaryDetailScreen() {
     return (
         <MainLayout>
             <MainLayout.Header>
-                <BackHeader title="일기 상세보기" rightComponent={<HelpButton />} />
+                <BackHeader title="일기 상세보기" />
             </MainLayout.Header>
 
-            <MainLayout.Content className="bg-gray5 flex-1 p-4">
+            <MainLayout.Content
+                isScrollable={true}
+                className="bg-gray5 flex-1 p-4"
+                refreshControl={
+                    <RefreshControl
+                        refreshing={Boolean(isFetching || isRefetching)}
+                        onRefresh={refetch}
+                    />
+                }
+            >
                 <View className="bg-white rounded-[20px] p-6 gap-y-6">
                     <Text className="text-gray90 text-[15px] font-semibold w-full text-left">
                         {diary?.created_at ? formatDateSimple(diary.created_at) : '-'}
@@ -60,7 +69,7 @@ export default function DiaryDetailScreen() {
                             isBig={false}
                         />
                         <Text className="text-gray90 text-[19px] font-bold">
-                            {userInfo?.name ?? '사용자'} 님이 {'\n'}
+                            {diary?.username ?? '사용자'} 님이 {'\n'}
                             {emotionKorMap[topEmotion ?? 'unknown']} 상태예요!
                         </Text>
                     </View>

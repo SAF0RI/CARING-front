@@ -160,3 +160,7 @@ export { default as ConnectIcon } from "./ic_connect.svg";
 export { default as UserEmptyIcon } from "./img_user_empty.svg";
 
 export { default as CalendarIcon } from "./ic_calendar.svg";
+
+export { default as ChartIcon } from "./ic_chart_active.svg";
+
+export { default as ChartDisabledIcon } from "./ic_chart_disabled.svg";

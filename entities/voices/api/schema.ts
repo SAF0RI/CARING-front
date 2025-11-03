@@ -70,6 +70,8 @@ export interface VoiceAnalyzePreviewRequest {
 }
 
 export interface VoiceAnalyzePreviewResponse {
+  username: string;
+  created_at: string;
   voice_id?: number | null;
   happy_pct: number;
   sad_pct: number;

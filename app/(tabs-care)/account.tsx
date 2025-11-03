@@ -25,9 +25,17 @@ export default function AccountScreen(
             </MainLayout.Header>
             <MainLayout.Content className="bg-gray5 flex-1 p-4 mx-0 px-0 py-0" footer={false}>
                 <View className={cn(['flex-col w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px] px-4'])}>
-                    <Icon name="ConnectIcon" size={24} />
-                    <Text className="text-gray90 text-[19px]"><Text className="text-main600 text-[19px] font-bold">{userPageInfo?.data?.connected_user_name}</Text>님이</Text>
-                    < Text className="text-gray90 text-[19px]">보호자로 연결되어 있습니다!</Text>
+                    {userPageInfo?.data?.connected_user_name ? (
+                        <>
+                            <Icon name="ConnectIcon" size={24} />
+                            <Text className="text-gray90 text-[19px]"><Text className="text-main600 text-[19px] font-bold">{userPageInfo?.data?.connected_user_name}</Text>님이</Text>
+                            <Text className="text-gray90 text-[19px]">피보호자로 연결되어 있습니다!</Text>
+                        </>
+                    ) : (
+                        <Text className="text-gray90 text-[19px]">피보호자가 연결되어 있지 않습니다!</Text>
+                    )
+                    }
+
                 </View>
                 <View className="flex-col gap-y-4 px-4 py-4 h-full">
                     <Text className="text-gray90 text-[19px] font-bold">개인정보</Text>

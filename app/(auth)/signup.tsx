@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { z } from "zod";
 
 export default function SignupScreen() {
@@ -50,10 +50,7 @@ export default function SignupScreen() {
         mutationFn: signUp,
         onSuccess: () => {
             setCurrentStep(3);
-        },
-        onError: (error) => {
-            Alert.alert("회원가입 실패", error.message);
-        },
+        }
     });
 
     const role = useWatch({

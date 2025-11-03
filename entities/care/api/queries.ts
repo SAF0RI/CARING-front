@@ -4,6 +4,7 @@ import {
   getCareUserVoiceList,
   getEmotionMonthlyFrequency,
   getEmotionWeeklySummary,
+  getTopEmotion,
 } from "./handler";
 
 export const careQueries = createQueryKeys("care", {
@@ -19,12 +20,23 @@ export const careQueries = createQueryKeys("care", {
     queryKey: [care_username, month],
     queryFn: () => getEmotionMonthlyFrequency({ care_username, month }),
   }),
-  careUserVoiceList: (care_username: string) => ({
-    queryKey: [care_username],
-    queryFn: () => getCareUserVoiceList(care_username),
+  careUserVoiceList: (care_username: string, date?: Date | string | null) => ({
+    queryKey: [
+      care_username,
+      typeof date === "string"
+        ? date
+        : date
+          ? date.toISOString().split("T")[0]
+          : "",
+    ],
+    queryFn: () => getCareUserVoiceList({ care_username, date }),
   }),
   careUserInfo: (care_username: string) => ({
     queryKey: [care_username],
     queryFn: () => getCareUserInfo({ care_username }),
+  }),
+  topEmotion: (care_username: string) => ({
+    queryKey: [care_username],
+    queryFn: () => getTopEmotion({ care_username }),
   }),
 });

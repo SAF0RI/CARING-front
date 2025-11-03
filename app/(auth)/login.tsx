@@ -10,7 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useForm, useWatch } from "react-hook-form";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 
 export default function LoginScreen() {
@@ -58,9 +59,6 @@ export default function LoginScreen() {
                 router.replace("/(tabs-user)/diary-list");
             }
 
-        },
-        onError: () => {
-            Alert.alert("로그인 실패", "아이디와 비밀번호를 확인해주세요.");
         }
     });
 
@@ -70,8 +68,17 @@ export default function LoginScreen() {
         defaultValue: Role.USER,
     });
 
+    const insets = useSafeAreaInsets();
+
     return (
-        <View className="flex items-center justify-start px-4 pt-20 h-full w-full gap-4">
+        <View className="flex items-center justify-start px-4 pt-20 h-full w-full gap-4"
+            style={{
+                paddingTop: insets.top + 80,
+                paddingLeft: insets.left + 16,
+                paddingBottom: insets.bottom,
+                paddingRight: insets.right + 16,
+            }}
+        >
             <Image
                 source={require('@/assets/images/img_logo_header.png')}
                 className="h-16 w-full mt-16 mb-10"
