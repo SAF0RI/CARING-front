@@ -58,16 +58,6 @@ export const WeeklyStatistics = ({ username, role = Role.CARE, isReport = true }
     // 새로운 API 응답 구조에 맞춰 감정 데이터 매핑
     // WeeklySummaryResponse: { weekly: [{ date: string, weekday: string, top_emotion: Emotion }] }
     const weeklyEmotions: (Emotion | null)[] = Array(7).fill(null);
-    // 요일별 샘플 데이터 (일~토 순): 실제 데이터가 없는 요일만 대체
-    const sampleEmotionByWeekday: Emotion[] = [
-        "happy",     // 일
-        "neutral",   // 월
-        "surprise",  // 화
-        "sad",       // 수
-        "fear",      // 목
-        "angry",     // 금
-        "happy",     // 토
-    ];
 
     if (weeklyData?.weekly && Array.isArray(weeklyData.weekly)) {
         weeklyData.weekly.forEach((item: any) => {
@@ -83,14 +73,6 @@ export const WeeklyStatistics = ({ username, role = Role.CARE, isReport = true }
                 weeklyEmotions[weekday] = emotion;
             }
         });
-    }
-
-    // 실제 데이터가 없는 요일은 샘플로 보완
-    for (let i = 0; i < 7; i++) {
-        if (!weeklyEmotions[i]) {
-            const weekdayIndex = i; // 0(일)~6(토)
-            weeklyEmotions[i] = sampleEmotionByWeekday[weekdayIndex];
-        }
     }
 
     const weeklySummary = isFetching ? "주간 마음일기 통계를 불러오는 중입니다." : "주 초반에는 즐겁고 안정적인 날들이 많았지만, 목요일부터 감정 상태가 급격히 바뀌었네요.";
@@ -176,7 +158,7 @@ export const WeeklyStatistics = ({ username, role = Role.CARE, isReport = true }
                                             transform: [{ translateY: -10 }],
                                         }}
                                     >
-                                        분노
+                                        불안
                                     </Text>
                                 </View>
                             );

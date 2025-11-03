@@ -49,7 +49,7 @@ export interface CareUserVoiceDetailResponse {
   success: boolean;
   voice: {
     voice_id: number;
-    created_at: string; // ISO string
+    created_at: string;
     top_emotion?: Emotion | null;
     transcript?: string;
     emotions?: Partial<Record<Emotion, number>>;
