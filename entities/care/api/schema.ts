@@ -65,3 +65,17 @@ export interface TopEmotionResponse {
   user_name: string;
   top_emotion: Emotion;
 }
+
+export interface NotificationRequest {
+  care_username: string;
+}
+export interface NotificationResponse {
+  success: boolean;
+  notifications: {
+    notification_id: number;
+    voice_id: number;
+    name: string;
+    top_emotion: Emotion;
+    created_at: string;
+  }[];
+}

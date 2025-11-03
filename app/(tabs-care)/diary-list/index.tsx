@@ -51,10 +51,10 @@ export default function DiaryListScreen() {
     });
 
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
     const { data: diaries, refetch, isFetching } = useQuery({
-        ...queries.care.careUserVoiceList(userInfo?.username ?? '', selectedDate),
+        ...queries.care.careUserVoiceList(userInfo?.username ?? '', selectedDate ?? undefined),
         enabled: !!userInfo?.username,
     });
 
@@ -113,7 +113,7 @@ export default function DiaryListScreen() {
                 />
                 {showDatePicker && (
                     <DateTimePicker
-                        value={selectedDate}
+                        value={selectedDate ?? new Date()}
                         mode="date"
                         display={Platform.OS === 'ios' ? 'default' : 'default'}
                         onChange={handleDateChange}
@@ -138,9 +138,9 @@ export default function DiaryListScreen() {
                         contentContainerClassName="gap-y-1"
                         showsVerticalScrollIndicator={false}
                         scrollEnabled
-                        // 현재 날짜 표시
+                        // 현재 선택 상태 표시 (null이면 전체)
                         ListHeaderComponent={() => <View className="pl-4 pb-2">
-                            <Text className="text-gray90 text-[19px] font-semibold">{formatDate(selectedDate.toISOString())}</Text>
+                            <Text className="text-gray90 text-[19px] font-semibold">{selectedDate ? formatDate(selectedDate.toISOString()) : '전체 일기'}</Text>
                         </View>}
                         ListEmptyComponent={
                             <View className="flex-1 justify-center items-center">

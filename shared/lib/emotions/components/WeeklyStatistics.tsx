@@ -75,6 +75,12 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
     const weeklySummary = isLoading ? "주간 마음일기 통계를 불러오는 중입니다." : "주 초반에는 즐겁고 안정적인 날들이 많았지만, 목요일부터 감정 상태가 급격히 바뀌었네요.";
 
     const yAxisEmotions: Emotion[] = ["happy", "neutral", "surprise", "sad", "fear", "angry"];
+    // 고정 높이 기반 레이아웃: h-64(=256), 하단 날짜 영역(외부 pb-8 32 + 내부 paddingBottom 32)
+    const CONTAINER_HEIGHT = 256;
+    const OUTER_BOTTOM_PADDING = 32; // 부모 pb-8
+    const INNER_BOTTOM_PADDING = 32; // 내부 컨테이너 paddingBottom
+    const TOTAL_BOTTOM_PADDING = OUTER_BOTTOM_PADDING + INNER_BOTTOM_PADDING; // 64
+    const ICON_SIZE = 24;
 
     return (
         <View className="bg-white rounded-[20px] p-6 gap-y-4 mb-4">
@@ -119,7 +125,7 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
                 <View className="h-64 relative pb-8">
                     <View className="flex-1 ml-12 mr-4 flex-row justify-between items-stretch relative" style={{ paddingBottom: 32 }}>
                         {(() => {
-                            const paddingBottomRatio = 32 / 256;
+                            const paddingBottomRatio = (TOTAL_BOTTOM_PADDING) / CONTAINER_HEIGHT;
                             const availableHeight = 100 - (paddingBottomRatio * 100);
                             const topLabelPercentage = (0 / (yAxisEmotions.length - 1)) * availableHeight;
                             const bottomLabelPercentage = ((yAxisEmotions.length - 1) / (yAxisEmotions.length - 1)) * availableHeight;
@@ -149,14 +155,14 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
                                             transform: [{ translateY: -10 }],
                                         }}
                                     >
-                                        불안
+                                        분노
                                     </Text>
                                 </View>
                             );
                         })()}
 
                         {yAxisEmotions.map((emotion, index) => {
-                            const paddingBottomRatio = 32 / 256;
+                            const paddingBottomRatio = (TOTAL_BOTTOM_PADDING) / CONTAINER_HEIGHT;
                             const availableHeight = 100 - (paddingBottomRatio * 100);
                             const topPercentage = (index / (yAxisEmotions.length - 1)) * availableHeight;
 
@@ -176,34 +182,15 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
                         {weekDates.map((date, dayIndex) => {
                             const dayOfWeek = date.getDay();
                             const dayName = weekDays[dayOfWeek];
-                            const emotion = weeklyEmotions[dayIndex];
                             const isToday =
                                 date.getFullYear() === new Date().getFullYear() &&
                                 date.getMonth() === new Date().getMonth() &&
                                 date.getDate() === new Date().getDate();
 
-                            const emotionIndex = emotion ? yAxisEmotions.indexOf(emotion) : -1;
-                            const paddingBottom = 32;
-                            const availableHeight = 100 - (paddingBottom / 256 * 100);
-                            const yPosition = emotionIndex >= 0
-                                ? `${(emotionIndex / (yAxisEmotions.length - 1)) * availableHeight}%`
-                                : `${availableHeight / 2}%`;
+                            // 아이콘 위치 계산은 아래 오버레이 레이어에서 수행
 
                             return (
                                 <View key={`${dayIndex}-${date.toISOString()}`} className="flex-1 items-center justify-center relative" style={{ minHeight: 200 }}>
-                                    {emotion && (
-                                        <View
-                                            className="absolute items-center justify-center"
-                                            style={{
-                                                top: yPosition as any,
-                                                transform: [{ translateY: -8 }],
-                                                width: 24,
-                                                height: 24,
-                                            }}
-                                        >
-                                            <EmotionIconComponent emotion={emotion as Emotion} isBig={false} />
-                                        </View>
-                                    )}
                                     <View className="absolute bottom-0">
                                         <Text className="text-gray70 text-[12px] text-center">
                                             {dayName}
@@ -215,6 +202,38 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
                                 </View>
                             );
                         })}
+
+                        {/* 아이콘 오버레이: 가이드선과 동일 좌표계에서 렌더링 (하단 32px 내부 패딩 제외) */}
+                        <View className="absolute left-0 right-0" style={{ top: 0, bottom: INNER_BOTTOM_PADDING }}>
+                            <View className="flex-1 ml-12 mr-4 flex-row justify-between items-stretch relative">
+                                {weekDates.map((date, dayIndex) => {
+                                    const emotion = weeklyEmotions[dayIndex];
+                                    const emotionIndex = emotion ? yAxisEmotions.indexOf(emotion) : -1;
+                                    const ratio = emotionIndex >= 0
+                                        ? (emotionIndex / (yAxisEmotions.length - 1))
+                                        : 0.5;
+                                    const topPercent = ratio * 100;
+
+                                    return (
+                                        <View key={`icon-${dayIndex}-${date.toISOString()}`} className="flex-1 items-center justify-center relative">
+                                            {emotion && (
+                                                <View
+                                                    className="absolute items-center justify-center"
+                                                    style={{
+                                                        top: `${topPercent}%` as any,
+                                                        transform: [{ translateY: -ICON_SIZE / 2 }],
+                                                        width: ICON_SIZE,
+                                                        height: ICON_SIZE,
+                                                    }}
+                                                >
+                                                    <EmotionIconComponent emotion={emotion as Emotion} isBig={false} />
+                                                </View>
+                                            )}
+                                        </View>
+                                    );
+                                })}
+                            </View>
+                        </View>
 
                         <View className="absolute left-0 right-0 top-0 bottom-0 pointer-events-none" />
                     </View>

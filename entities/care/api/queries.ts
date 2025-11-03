@@ -4,6 +4,7 @@ import {
   getCareUserVoiceList,
   getEmotionMonthlyFrequency,
   getEmotionWeeklySummary,
+  getNotifications,
   getTopEmotion,
 } from "./handler";
 
@@ -38,5 +39,9 @@ export const careQueries = createQueryKeys("care", {
   topEmotion: (care_username: string) => ({
     queryKey: [care_username],
     queryFn: () => getTopEmotion({ care_username }),
+  }),
+  notifications: (care_username: string) => ({
+    queryKey: [care_username],
+    queryFn: () => getNotifications({ care_username }),
   }),
 });

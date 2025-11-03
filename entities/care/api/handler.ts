@@ -6,6 +6,7 @@ import {
   CareUserVoiceListResponse,
   MonthlyFrequencyRequest,
   MonthlyFrequencyResponse,
+  NotificationResponse,
   TopEmotionResponse,
   WeeklySummaryRequest,
   WeeklySummaryResponse,
@@ -80,6 +81,17 @@ export const getTopEmotion = async ({
 }): Promise<TopEmotionResponse> => {
   const response = await GetAxiosInstance<TopEmotionResponse>(
     `/care/top_emotion?care_username=${encodeURIComponent(care_username)}`
+  );
+  return response.data;
+};
+
+export const getNotifications = async ({
+  care_username,
+}: {
+  care_username: string;
+}): Promise<NotificationResponse> => {
+  const response = await GetAxiosInstance<NotificationResponse>(
+    `/care/notifications?care_username=${encodeURIComponent(care_username)}`
   );
   return response.data;
 };

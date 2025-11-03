@@ -39,10 +39,12 @@ export default function HomeScreen() {
         }
     };
 
+
+
     return (
         <MainLayout className="bg-gray-50">
             <MainLayout.Header>
-                <MainHeader title="홈" rightComponent={<RingButton number={1} />} />
+                <MainHeader title="홈" rightComponent={<RingButton number={1} onPress={() => router.push("/(notifications)")} />} />
             </MainLayout.Header>
             <ScrollView
                 showsVerticalScrollIndicator={false}

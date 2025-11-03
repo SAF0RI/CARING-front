@@ -4,7 +4,6 @@ import { Role } from "@/entities/user/api/schema";
 import { getLocalUserInfo } from "@/entities/user/api/storage";
 import { FcmProvider } from '@/shared/lib/fcm';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { isAxiosError } from "axios";
 import { Redirect, Slot, useRootNavigationState, useSegments } from "expo-router";
 import { useEffect, useMemo, useState } from 'react';
 import { Alert } from "react-native";
@@ -34,12 +33,9 @@ export default function RootLayout() {
           console.log("[RQ][Mutation][Response]", { data, variables });
         },
         onError: (error, variables) => {
-          if (isAxiosError(error)) {
-            Alert.alert("오류", error.response?.data?.error);
-          } else {
-            Alert.alert("오류", error.message);
-          }
-          console.log("[RQ][Mutation][Error]", { error, variables });
+          console.log(error, "error");
+          Alert.alert("오류", (error as any).response?.data?.message ?? '알 수 없는 오류가 발생했습니다.');
+          //console.log("[RQ][Mutation][Error]", { error, variables });
         },
       },
     },
