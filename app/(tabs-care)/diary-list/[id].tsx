@@ -51,6 +51,7 @@ export default function DiaryDetailScreen() {
             <MainLayout.Content
                 isScrollable={true}
                 className="bg-gray5 flex-1 p-4"
+                footer={false}
                 refreshControl={
                     <RefreshControl
                         refreshing={Boolean(isFetching || isRefetching)}

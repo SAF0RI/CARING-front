@@ -1,13 +1,15 @@
 import { queries } from "@/entities";
+import { Role } from "@/entities/user/api/schema";
 import { Emotion } from "@/entities/voices/api/schema";
 import { formatDateRange, formatYearMonth, getWeekOfMonth, getWeekRange } from "@/shared/util/format";
+import { useFocusEffect } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { normalizeEmotion } from "../util";
 import { EmotionIconComponent } from "./EmotionIconComponent";
 
-export const WeeklyStatistics = ({ username, isReport = true }: { username: string, isReport?: boolean }) => {
+export const WeeklyStatistics = ({ username, role = Role.CARE, isReport = true }: { username: string, role?: Role, isReport?: boolean }) => {
 
     const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -19,10 +21,24 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
     const monthString = formatYearMonth(currentDate);
     const weekRange = getWeekRange(year, month, week);
 
-    const { data: weeklyData, isLoading } = useQuery({
-        ...queries.care.emotionWeeklySummary(username, monthString, week),
-        enabled: !!username,
-    });
+    const { data: weeklyData, isFetching, refetch } = useQuery<any>({
+        ...(role === Role.CARE
+            ? (queries.care.emotionWeeklySummary(username, monthString, week) as any)
+            : (queries.user.weeklySummary(username, monthString, week) as any)),
+        enabled: !!username && !!role,
+        refetchOnReconnect: true,
+        refetchOnMount: "always",
+    } as any);
+
+    // 화면 포커스 시 최신 데이터로 재조회
+    useFocusEffect(
+        useCallback(() => {
+            if (username && role) {
+                refetch();
+            }
+        }, [username, role, refetch])
+    );
+
 
     const handlePrevWeek = () => {
         const newDate = new Date(currentDate);
@@ -36,43 +52,48 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
         setCurrentDate(newDate);
     };
 
-    // 주차의 각 날짜 계산
-    const weekDates: Date[] = [];
-    for (let i = 0; i < 7; i++) {
-        const date = new Date(weekRange.start);
-        date.setDate(date.getDate() + i);
-        weekDates.push(date);
-    }
+    // 요일 고정 순서: 일(0) ~ 토(6)
+    const weekdaysOrder: number[] = [0, 1, 2, 3, 4, 5, 6];
 
     // 새로운 API 응답 구조에 맞춰 감정 데이터 매핑
     // WeeklySummaryResponse: { weekly: [{ date: string, weekday: string, top_emotion: Emotion }] }
     const weeklyEmotions: (Emotion | null)[] = Array(7).fill(null);
+    // 요일별 샘플 데이터 (일~토 순): 실제 데이터가 없는 요일만 대체
+    const sampleEmotionByWeekday: Emotion[] = [
+        "happy",     // 일
+        "neutral",   // 월
+        "surprise",  // 화
+        "sad",       // 수
+        "fear",      // 목
+        "angry",     // 금
+        "happy",     // 토
+    ];
 
     if (weeklyData?.weekly && Array.isArray(weeklyData.weekly)) {
-        weeklyData.weekly.forEach((item) => {
+        weeklyData.weekly.forEach((item: any) => {
             if (!item.date || !item.top_emotion) return;
 
-            // 날짜 문자열로 매칭 ('YYYY-MM-DD' 형식)
             const itemDate = new Date(item.date);
             if (isNaN(itemDate.getTime())) return;
 
-            const dayIndex = weekDates.findIndex(
-                (d) =>
-                    d.getFullYear() === itemDate.getFullYear() &&
-                    d.getMonth() === itemDate.getMonth() &&
-                    d.getDate() === itemDate.getDate()
-            );
-
-            if (dayIndex >= 0 && dayIndex < 7) {
-                const emotion = normalizeEmotion(item.top_emotion);
-                if (emotion) {
-                    weeklyEmotions[dayIndex] = emotion;
-                }
+            // 요일 기준으로 배치 (0=일 ~ 6=토)
+            const weekday = itemDate.getDay();
+            const emotion = normalizeEmotion(item.top_emotion);
+            if (emotion) {
+                weeklyEmotions[weekday] = emotion;
             }
         });
     }
 
-    const weeklySummary = isLoading ? "주간 마음일기 통계를 불러오는 중입니다." : "주 초반에는 즐겁고 안정적인 날들이 많았지만, 목요일부터 감정 상태가 급격히 바뀌었네요.";
+    // 실제 데이터가 없는 요일은 샘플로 보완
+    for (let i = 0; i < 7; i++) {
+        if (!weeklyEmotions[i]) {
+            const weekdayIndex = i; // 0(일)~6(토)
+            weeklyEmotions[i] = sampleEmotionByWeekday[weekdayIndex];
+        }
+    }
+
+    const weeklySummary = isFetching ? "주간 마음일기 통계를 불러오는 중입니다." : "주 초반에는 즐겁고 안정적인 날들이 많았지만, 목요일부터 감정 상태가 급격히 바뀌었네요.";
 
     const yAxisEmotions: Emotion[] = ["happy", "neutral", "surprise", "sad", "fear", "angry"];
     // 고정 높이 기반 레이아웃: h-64(=256), 하단 날짜 영역(외부 pb-8 32 + 내부 paddingBottom 32)
@@ -117,13 +138,13 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
                 }
             </View>
 
-            {isLoading ? (
+            {isFetching ? (
                 <View className="h-64 items-center justify-center">
                     <ActivityIndicator size="large" color="#6366f1" />
                 </View>
             ) : (
                 <View className="h-64 relative pb-8">
-                    <View className="flex-1 ml-12 mr-4 flex-row justify-between items-stretch relative" style={{ paddingBottom: 32 }}>
+                    <View className="flex-1 ml-12 mr-4 flex-row items-stretch relative gap-x-2" style={{ paddingBottom: 32 }}>
                         {(() => {
                             const paddingBottomRatio = (TOTAL_BOTTOM_PADDING) / CONTAINER_HEIGHT;
                             const availableHeight = 100 - (paddingBottomRatio * 100);
@@ -179,18 +200,12 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
                             );
                         })}
 
-                        {weekDates.map((date, dayIndex) => {
-                            const dayOfWeek = date.getDay();
+                        {weekdaysOrder.map((dayOfWeek) => {
                             const dayName = weekDays[dayOfWeek];
-                            const isToday =
-                                date.getFullYear() === new Date().getFullYear() &&
-                                date.getMonth() === new Date().getMonth() &&
-                                date.getDate() === new Date().getDate();
-
-                            // 아이콘 위치 계산은 아래 오버레이 레이어에서 수행
+                            const isToday = new Date().getDay() === dayOfWeek;
 
                             return (
-                                <View key={`${dayIndex}-${date.toISOString()}`} className="flex-1 items-center justify-center relative" style={{ minHeight: 200 }}>
+                                <View key={`col-${dayOfWeek}`} className="flex-1 items-center justify-center relative" style={{ minHeight: 200 }}>
                                     <View className="absolute bottom-0">
                                         <Text className="text-gray70 text-[12px] text-center">
                                             {dayName}
@@ -205,24 +220,28 @@ export const WeeklyStatistics = ({ username, isReport = true }: { username: stri
 
                         {/* 아이콘 오버레이: 가이드선과 동일 좌표계에서 렌더링 (하단 32px 내부 패딩 제외) */}
                         <View className="absolute left-0 right-0" style={{ top: 0, bottom: INNER_BOTTOM_PADDING }}>
-                            <View className="flex-1 ml-12 mr-4 flex-row justify-between items-stretch relative">
-                                {weekDates.map((date, dayIndex) => {
-                                    const emotion = weeklyEmotions[dayIndex];
+                            <View className="flex-1 ml-12 mr-4 flex-row items-stretch relative gap-x-2">
+                                {weekdaysOrder.map((dayOfWeek) => {
+                                    const emotion = weeklyEmotions[dayOfWeek];
                                     const emotionIndex = emotion ? yAxisEmotions.indexOf(emotion) : -1;
                                     const ratio = emotionIndex >= 0
                                         ? (emotionIndex / (yAxisEmotions.length - 1))
                                         : 0.5;
-                                    const topPercent = ratio * 100;
+                                    // 가이드선과 동일한 좌표계(availableHeight%)를 사용
+                                    const paddingBottomRatio = (TOTAL_BOTTOM_PADDING) / CONTAINER_HEIGHT;
+                                    const availableHeight = 100 - (paddingBottomRatio * 100);
+                                    const topPercent = ratio * availableHeight;
 
                                     return (
-                                        <View key={`icon-${dayIndex}-${date.toISOString()}`} className="flex-1 items-center justify-center relative">
+                                        <View key={`icon-${dayOfWeek}`} className="flex-1 items-center justify-center relative">
                                             {emotion && (
                                                 <View
                                                     className="absolute items-center justify-center"
                                                     style={{
                                                         top: `${topPercent}%` as any,
+                                                        left: 0,
+                                                        right: 0,
                                                         transform: [{ translateY: -ICON_SIZE / 2 }],
-                                                        width: ICON_SIZE,
                                                         height: ICON_SIZE,
                                                     }}
                                                 >

@@ -7,7 +7,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 
 export default function SignupScreen() {
@@ -72,55 +73,59 @@ export default function SignupScreen() {
         signUpMutation(data);
     });
 
-
+    const inset = useSafeAreaInsets();
     return (
-        <MainLayout>
+        <MainLayout style={{ paddingBottom: inset.bottom }}>
             <MainLayout.Header>
                 <BackHeader title="회원가입" />
             </MainLayout.Header>
             <MainLayout.Content className="bg-white h-full" footer={false}>
                 {currentStep === 1 && (
-                    <View className="flex flex-col h-full justify-between">
-                        <View className="flex items-start justify-center px-4">
-                            <Text className="font-bold text-2xl">회원가입을 위한 정보를</Text>
-                            <Text className="font-bold text-2xl">입력해주세요.</Text>
-                        </View>
-                        <View className="flex-1 items-center justify-start gap-y-4 mx-4 mt-8">
-                            <InfoInput
-                                name="name"
-                                control={control}
-                                placeholder="이름"
-                                secureTextEntry={false}
-                                label="이름"
-                                keyboardType="default"
-                            />
-                            <InfoInput
-                                name="username"
-                                control={control}
-                                placeholder="아이디"
-                                secureTextEntry={false}
-                                label="아이디"
-                                keyboardType="default"
-                            />
-                            <InfoInput
-                                name="password"
-                                control={control}
-                                placeholder="비밀번호"
-                                secureTextEntry={true}
-                                label="비밀번호"
-                                sublabel="비밀번호를 입력해주세요."
-                                keyboardType="default"
-                            />
-                            <InfoInput
-                                name="confirmPassword"
-                                control={control}
-                                placeholder="비밀번호 확인"
-                                secureTextEntry={true}
-                                label="비밀번호 확인"
-                                sublabel="비밀번호를 다시 입력해주세요."
-                                keyboardType="default"
-                            />
-                        </View>
+                    <>
+                        <ScrollView className="flex flex-col h-full">
+                            <View className="flex items-start justify-center px-4">
+                                <Text className="font-bold text-2xl">회원가입을 위한 정보를</Text>
+                                <Text className="font-bold text-2xl">입력해주세요.</Text>
+                            </View>
+                            <View className="flex-1 items-center justify-start gap-y-4 mx-4 mt-8">
+                                <InfoInput
+                                    name="name"
+                                    control={control}
+                                    placeholder="이름"
+                                    secureTextEntry={false}
+                                    label="이름"
+                                    keyboardType="default"
+                                />
+                                <InfoInput
+                                    name="username"
+                                    control={control}
+                                    placeholder="아이디"
+                                    secureTextEntry={false}
+                                    label="아이디"
+                                    keyboardType="default"
+                                />
+                                <InfoInput
+                                    name="password"
+                                    control={control}
+                                    placeholder="비밀번호"
+                                    secureTextEntry={true}
+                                    label="비밀번호"
+                                    sublabel="비밀번호를 입력해주세요."
+                                    keyboardType="default"
+                                />
+                                <InfoInput
+                                    name="confirmPassword"
+                                    control={control}
+                                    placeholder="비밀번호 확인"
+                                    secureTextEntry={true}
+                                    label="비밀번호 확인"
+                                    sublabel="비밀번호를 다시 입력해주세요."
+                                    keyboardType="default"
+                                />
+                                <View className="h-10" />
+                            </View>
+
+                        </ScrollView>
                         <Button
                             onPress={handleNextFromStep1}
                             size="lg"
@@ -129,7 +134,7 @@ export default function SignupScreen() {
                         >
                             <Text className="text-white font-bold">다음</Text>
                         </Button>
-                    </View>
+                    </>
                 )}
 
                 {currentStep === 2 && (

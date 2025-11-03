@@ -22,7 +22,7 @@ export default function AccountScreen() {
             <MainLayout.Header>
                 <MainHeader title="내 정보" rightComponent={<HelpButton />} />
             </MainLayout.Header>
-            <MainLayout.Content className="bg-gray5 flex-1 p-4 mx-0 px-0 py-0" footer={true}>
+            <MainLayout.Content className="bg-gray5 flex-1 p-4 mx-0 px-0 py-0" footer={false}>
                 <View className={cn(['flex-col w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px] px-4'])}>
                     {
                         userPageInfo?.data?.connected_care_name ? (

@@ -1,12 +1,25 @@
 import { queries } from "@/entities";
+import { Role } from "@/entities/user/api/schema";
 import { MonthlyFrequencyStatistics, WeeklyStatistics } from "@/shared/lib/emotions/components";
 import { BackHeader, HelpButton, MainLayout } from "@/shared/ui";
-import { useQuery } from "@tanstack/react-query";
-import { ScrollView, Text, View } from "react-native";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 
 export default function DiaryAnalysisScreen() {
   const { data: userInfo } = useQuery(queries.user.userInfo);
-  const username = userInfo?.username || "";
+  const queryClient = useQueryClient();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      // 전체 관련 쿼리 무효화하여 재조회
+      await queryClient.invalidateQueries();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [queryClient]);
 
   return (
     <MainLayout>
@@ -15,7 +28,10 @@ export default function DiaryAnalysisScreen() {
       </MainLayout.Header>
 
       <MainLayout.Content className="bg-gray5 flex-1 p-4" footer={false}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        >
           <View className="items-center mb-4">
             <Text className="text-main900 text-[20px] font-bold text-center">
               나의 감정 분석 결과
@@ -28,11 +44,11 @@ export default function DiaryAnalysisScreen() {
           <Text className="text-gray100 text-[20px] font-bold text-left mb-4">
             주간 마음일기 통계
           </Text>
-          <WeeklyStatistics username={username} />
+          <WeeklyStatistics username={userInfo?.username ?? ''} role={Role.USER} />
           <Text className="text-gray100 text-[20px] font-bold text-left mb-4">
             감정 빈도 통계
           </Text>
-          <MonthlyFrequencyStatistics username={username} />
+          <MonthlyFrequencyStatistics username={userInfo?.username ?? ''} role={Role.USER} />
         </ScrollView>
       </MainLayout.Content>
     </MainLayout>

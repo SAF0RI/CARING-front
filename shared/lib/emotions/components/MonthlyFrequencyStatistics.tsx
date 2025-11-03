@@ -1,4 +1,5 @@
 import { queries } from "@/entities";
+import { Role } from "@/entities/user/api/schema";
 import { Emotion } from "@/entities/voices/api";
 import { emotionKorMap, emotionRawColorMap } from "@/shared/lib/emotions/constant";
 import { formatYearMonth } from "@/shared/util/format";
@@ -7,16 +8,20 @@ import { useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 
-export const MonthlyFrequencyStatistics = ({ username, isReport = true }: { username: string, isReport?: boolean }) => {
+export const MonthlyFrequencyStatistics = ({ username, role = Role.CARE, isReport = true }: { username: string, role: Role, isReport?: boolean }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const monthString = formatYearMonth(currentDate);
 
-    const { data: monthlyData, isLoading } = useQuery({
-        ...queries.care.emotionMonthlyFrequency(username, monthString),
-        enabled: !!username,
+    console.log({ username })
+
+    const { data: monthlyData, isFetching } = useQuery({
+        ...(role === Role.CARE ? queries.care.emotionMonthlyFrequency(username, monthString) : queries.user.monthlyFrequency(username, monthString)),
+        enabled: !!username && !!role,
+        refetchOnReconnect: true,
+        refetchOnMount: "always",
     });
 
-    console.log(monthlyData);
+    console.log({ monthlyData });
 
     const handlePrevMonth = () => {
         const newDate = new Date(currentDate);
@@ -29,7 +34,7 @@ export const MonthlyFrequencyStatistics = ({ username, isReport = true }: { user
         newDate.setMonth(newDate.getMonth() + 1);
         setCurrentDate(newDate);
     };
-
+    console.log({ monthString });
 
     const frequency = monthlyData?.frequency || {};
 
@@ -43,11 +48,18 @@ export const MonthlyFrequencyStatistics = ({ username, isReport = true }: { user
         unknown: frequency.unknown || 0,
     };
 
+
+
     const maxFrequency = Math.max(...Object.values(frequencyData), 1);
     const maxYAxis = Math.ceil(maxFrequency / 5) * 5; // 5단위로 올림
     const yAxisTicks = [0, 5, 10, 15, 20].filter(tick => tick <= maxYAxis);
 
     const generateMonthlySummary = () => {
+
+        if (isFetching) {
+            return "감정 빈도 통계를 불러오는 중입니다.";
+        }
+
         const total = Object.values(frequencyData).reduce((sum, val) => sum + val, 0);
         if (total === 0) {
             return `${currentDate.getMonth() + 1}월에는 아직 감정 데이터가 없습니다.`;
@@ -122,7 +134,7 @@ export const MonthlyFrequencyStatistics = ({ username, isReport = true }: { user
             </View>
 
             {/* 바 차트 */}
-            {isLoading ? (
+            {isFetching ? (
                 <View className="h-64 items-center justify-center">
                     <ActivityIndicator size="large" color="#6366f1" />
                 </View>

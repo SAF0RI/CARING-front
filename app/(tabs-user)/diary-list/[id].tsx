@@ -55,7 +55,7 @@ export default function DiaryDetailScreen() {
                 <BackHeader title="일기 상세보기" rightComponent={<HelpButton />} />
             </MainLayout.Header>
 
-            <MainLayout.Content className="bg-gray5 flex-1 p-4">
+            <MainLayout.Content className="bg-gray5 flex-1 p-4" footer={false}>
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     refreshControl={

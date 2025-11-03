@@ -23,6 +23,11 @@ export default function HomeScreen() {
         enabled: !!userInfo?.data?.user_code,
     });
 
+    const { data: notifications, refetch: notificationsRefetch } = useQuery({
+        ...queries.care.notifications(userInfo?.data?.username ?? ''),
+        enabled: !!userInfo?.data?.username,
+    });
+
     const onRefresh = async () => {
         setRefreshing(true);
         try {
@@ -30,6 +35,7 @@ export default function HomeScreen() {
             await Promise.all([
                 topEmotionRefetch(),
                 userInfo.refetch(),
+                notificationsRefetch(),
                 username ? Promise.all([
                     queryClient.invalidateQueries({ queryKey: queries.care._def }),
                 ]) : Promise.resolve(),
@@ -44,7 +50,7 @@ export default function HomeScreen() {
     return (
         <MainLayout className="bg-gray-50">
             <MainLayout.Header>
-                <MainHeader title="홈" rightComponent={<RingButton number={1} onPress={() => router.push("/(notifications)")} />} />
+                <MainHeader title="홈" rightComponent={<RingButton number={notifications?.notifications?.length ?? 0} onPress={() => router.push("/(notifications)")} />} />
             </MainLayout.Header>
             <ScrollView
                 showsVerticalScrollIndicator={false}

@@ -1,4 +1,5 @@
 import { queries } from "@/entities";
+import { Role } from "@/entities/user/api/schema";
 import { MonthlyFrequencyStatistics, WeeklyStatistics } from "@/shared/lib/emotions/components";
 import { BackHeader, HelpButton, MainLayout } from "@/shared/ui";
 import { useQuery } from "@tanstack/react-query";
@@ -28,11 +29,11 @@ export default function DiaryAnalysisScreen() {
           <Text className="text-gray100 text-[20px] font-bold text-left mb-4">
             주간 마음일기 통계
           </Text>
-          <WeeklyStatistics username={username} />
+          <WeeklyStatistics username={username} role={Role.CARE} />
           <Text className="text-gray100 text-[20px] font-bold text-left mb-4">
             감정 빈도 통계
           </Text>
-          <MonthlyFrequencyStatistics username={username} />
+          <MonthlyFrequencyStatistics username={username} role={Role.CARE} />
         </ScrollView>
       </MainLayout.Content>
     </MainLayout>

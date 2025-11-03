@@ -1,5 +1,5 @@
 import { cn } from "@/shared/util/style";
-import { ScrollView, ScrollViewProps, View, ViewProps } from "react-native";
+import { ScrollView, ScrollViewProps, StyleProp, View, ViewProps, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Footer } from "../footer";
 
@@ -8,9 +8,10 @@ export type LayoutProps = {
     className?: string;
     footer?: boolean;
     isScrollable?: boolean;
+    style?: StyleProp<ViewStyle>;
 } & ViewProps & ScrollViewProps;
 
-export const MainLayout = ({ children, className, ...props }: LayoutProps) => {
+export const MainLayout = ({ children, className, style, ...props }: LayoutProps) => {
 
     const insets = useSafeAreaInsets();
 
@@ -19,7 +20,8 @@ export const MainLayout = ({ children, className, ...props }: LayoutProps) => {
             paddingTop: insets.top,
             paddingLeft: insets.left,
             paddingRight: insets.right,
-        }} {...props}>
+            ...(style as object)
+        } as ViewStyle} {...props}>
             {children}
         </View>
     );
