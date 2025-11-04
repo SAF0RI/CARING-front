@@ -22,6 +22,7 @@ type Optional<T> = {
 export interface MonthlyFrequencyResponse {
   success: boolean;
   frequency: Optional<Record<Emotion, number>>;
+  message: string;
 }
 
 export interface WeeklySummaryRequest {
@@ -37,6 +38,7 @@ export interface CareUserInfoResponse {
 }
 
 export interface WeeklySummaryResponse {
+  message: string;
   weekly: {
     // 'YYYY-MM-DD'
     date: string;
