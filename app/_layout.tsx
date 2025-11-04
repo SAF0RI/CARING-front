@@ -2,10 +2,16 @@ import { queries } from "@/entities";
 import type { UserInfo } from "@/entities/user/api/schema";
 import { Role } from "@/entities/user/api/schema";
 import { getLocalUserInfo } from "@/entities/user/api/storage";
-import { FcmProvider } from '@/shared/lib/fcm';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Redirect, Slot, useRootNavigationState, useSegments } from "expo-router";
-import { useEffect, useMemo, useState } from 'react';
+import { FcmProvider } from "@/shared/lib/fcm";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
+import {
+  Redirect,
+  Slot,
+  useRootNavigationState,
+  useSegments,
+} from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../index.css";
@@ -20,26 +26,41 @@ export default function RootLayout() {
   const inAuthGroup = segments[0] === "(auth)";
 
   // QueryClient를 메모이제이션하여 앱이 재시작될 때마다 새로 생성되지 않도록 함
-  const queryClient = useMemo(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-      mutations: {
-        onMutate: (variables) => {
-          console.log("[RQ][Mutation][Request]", variables);
+  const queryClient = useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: false,
+          },
+          mutations: {
+            onMutate: (variables) => {
+              console.log("[RQ][Mutation][Request]", variables);
+            },
+            onSuccess: (data, variables) => {
+              console.log("[RQ][Mutation][Response]", { data, variables });
+            },
+            onError: (error, variables) => {
+              console.log(error, "error");
+              if (isAxiosError(error)) {
+                Alert.alert(
+                  "오류",
+                  error.response?.data?.message ??
+                    "알 수 없는 오류가 발생했습니다."
+                );
+              } else {
+                Alert.alert(
+                  "오류",
+                  error.message ?? "알 수 없는 오류가 발생했습니다."
+                );
+              }
+              //console.log("[RQ][Mutation][Error]", { error, variables });
+            },
+          },
         },
-        onSuccess: (data, variables) => {
-          console.log("[RQ][Mutation][Response]", { data, variables });
-        },
-        onError: (error, variables) => {
-          console.log(error, "error");
-          Alert.alert("오류", (error as any).response?.data?.message ?? '알 수 없는 오류가 발생했습니다.');
-          //console.log("[RQ][Mutation][Error]", { error, variables });
-        },
-      },
-    },
-  }), []);
+      }),
+    []
+  );
 
   useEffect(() => {
     (async () => {
@@ -77,7 +98,7 @@ export default function RootLayout() {
         <FcmProvider>
           <Slot />
         </FcmProvider>
-      </QueryClientProvider >
+      </QueryClientProvider>
     </SafeAreaProvider>
   );
 }
