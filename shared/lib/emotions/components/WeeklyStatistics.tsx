@@ -7,6 +7,7 @@ import {
   getWeekOfMonth,
   getWeekRange,
 } from "@/shared/util/format";
+import { cn } from "@/shared/util/style";
 import { useFocusEffect } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
@@ -210,29 +211,12 @@ export const WeeklyStatistics = ({
 
             {weekdaysOrder.map((dayOfWeek) => {
               const dayName = weekDays[dayOfWeek];
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-
-              const weekStart = new Date(weekRange.start);
-              const dayDate = new Date(weekStart);
-              dayDate.setDate(
-                weekStart.getDate() + dayOfWeek - weekStart.getDay()
-              );
-
-              const isToday = dayDate.getTime() === today.getTime();
+              const isToday = new Date().getDay() === dayOfWeek;
 
               return (
-                <View
-                  key={`col-${dayOfWeek}`}
-                  className="flex-1 items-center justify-center relative"
-                  style={{ minHeight: 200 }}
-                >
-                  <View
-                    className={`absolute flex-col items-center justify-center`}
-                  >
-                    <Text
-                      className={`text-gray70 text-[12px] text-center ${isToday ? "text-main700 font-bold" : ""}`}
-                    >
+                <View key={`col-${dayOfWeek}`} className="flex-1 items-center justify-center relative" style={{ minHeight: 200 }}>
+                  <View className="absolute bottom-0">
+                    <Text className={cn("text-gray70 text-[12px] text-center", isToday && "text-main700 font-bold")}>
                       {dayName}
                     </Text>
                   </View>
