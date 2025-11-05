@@ -4,14 +4,14 @@ export const emotionKorMap: Record<Emotion | "unknown", string> = {
   neutral: "안정",
   surprise: "놀람",
   sad: "슬픔",
-  fear: "불안",
+  anxiety: "불안",
   unknown: "분석 중",
   angry: "분노",
 } as const;
 
 export const emotionBgColorMap: Record<Emotion, string> = {
   unknown: "bg-gray10",
-  fear: "bg-point50",
+  anxiety: "bg-point50",
   neutral: "bg-green50",
   happy: "bg-point50",
   sad: "bg-blue50",
@@ -21,7 +21,7 @@ export const emotionBgColorMap: Record<Emotion, string> = {
 
 export const emotionTextColorMap: Record<Emotion, string> = {
   unknown: "text-gray90",
-  fear: "text-point700",
+  anxiety: "text-point700",
   neutral: "text-green700",
   happy: "text-point700",
   sad: "text-blue700",
@@ -34,7 +34,7 @@ export const emotionRawColorMap: Record<Emotion, string> = {
   neutral: "#34C759", // 초록
   surprise: "#FFCC00", // 노랑
   sad: "#007AFF", // 파랑
-  fear: "#FF6B6B", // 주황빨강
+  anxiety: "#FF6B6B", // 주황빨강
   angry: "#FF3B30", // 빨강
   unknown: "#8E8E93", // 회색
 } as const;
@@ -44,6 +44,6 @@ export const defaultLabels = [
   "happy",
   "sad",
   "angry",
-  "fear",
+  "anxiety",
   "surprise",
 ] as const;

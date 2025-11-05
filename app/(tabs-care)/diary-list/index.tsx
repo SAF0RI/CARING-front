@@ -98,7 +98,7 @@ export default function DiaryListScreen() {
         <MainLayout>
             <MainLayout.Header>
                 <MainHeader
-                    title="일기 리스트"
+                    title="일기 목록"
                     rightComponent={
                         <Button
                             size="md"
@@ -149,6 +149,7 @@ export default function DiaryListScreen() {
                                 </Text>
                             </View>
                         }
+                        ListFooterComponent={() => <View className="h-10" />}
                     />
                 )}
             </MainLayout.Content>

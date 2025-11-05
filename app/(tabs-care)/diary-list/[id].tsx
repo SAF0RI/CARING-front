@@ -25,6 +25,8 @@ export default function DiaryDetailScreen() {
         enabled: !!id && !!userInfo?.username,
     });
 
+    console.log({ diary });
+
 
     const currentDiary = diary?.voice_id === Number(id) ? diary : null;
     const topEmotion = (currentDiary?.top_emotion ?? null) as Emotion | null;
@@ -34,13 +36,13 @@ export default function DiaryDetailScreen() {
         neutral: currentDiary.neutral_pct ?? 0,
         surprise: currentDiary.surprise_pct ?? 0,
         sad: currentDiary.sad_pct ?? 0,
-        fear: currentDiary.fear_pct ?? 0,
+        ...(currentDiary.anxiety_pct ? { anxiety: currentDiary.anxiety_pct } : { anxiety: currentDiary.fear_pct ?? 0, }),
         angry: currentDiary.angry_pct ?? 0,
     } : {};
 
     const emotionCharacteristics = emotionCharacteristicsMap[topEmotion ?? 'unknown'];
 
-    const emotionOrder: Emotion[] = ['happy', 'neutral', 'surprise', 'sad', 'fear', 'angry'];
+    const emotionOrder: Emotion[] = ['happy', 'neutral', 'surprise', 'sad', 'anxiety', 'angry'];
 
     return (
         <MainLayout>
@@ -66,17 +68,17 @@ export default function DiaryDetailScreen() {
 
                     <View className="flex-row items-center gap-x-2">
                         <EmotionIconComponent
-                            emotion={(topEmotion ?? 'unknown')}
+                            emotion={(topEmotion === 'fear' ? 'anxiety' : topEmotion) ?? 'unknown'}
                             isBig={false}
                         />
                         <Text className="text-gray90 text-[19px] font-bold">
                             {diary?.username ?? '사용자'} 님이 {'\n'}
-                            {emotionKorMap[topEmotion ?? 'unknown']} 상태예요!
+                            {emotionKorMap[topEmotion === 'fear' ? 'anxiety' : topEmotion ?? 'unknown']} 상태예요!
                         </Text>
                     </View>
 
                     <View className="gap-y-3">
-                        {emotionCharacteristics.map((characteristic: string, index: number) => (
+                        {emotionCharacteristics?.map((characteristic: string, index: number) => (
                             <View
                                 key={index}
                                 className="bg-gray10 rounded-[12px] px-4 py-1"

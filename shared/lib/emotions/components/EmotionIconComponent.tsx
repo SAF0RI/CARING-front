@@ -5,7 +5,7 @@ export const EmotionIconComponent = ({ emotion, isBig, size, className }: { emot
     switch (emotion) {
         case "unknown":
             return <Icon name="Spinner" size={size ?? (isBig ? 40 : 20)} className={className} />;
-        case "fear":
+        case "anxiety":
             return <Icon name="fear" size={size ?? (isBig ? 40 : 20)} className={className} />;
         case "neutral":
             return <Icon name="neutral" size={size ?? (isBig ? 40 : 20)} className={className} />;

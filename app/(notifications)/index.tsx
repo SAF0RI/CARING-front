@@ -11,11 +11,11 @@ const NotificationItem = ({ item }: { item: NotificationResponse['notifications'
     return (
         <View className="flex-row items-center justify-between gap-x-2">
 
-            <EmotionIconComponent className="self-center my-auto" emotion={item.top_emotion} isBig={true} size={24} />
+            <EmotionIconComponent className="self-center my-auto" emotion={item.top_emotion === 'fear' ? 'anxiety' : item.top_emotion ?? 'unknown'} isBig={true} size={24} />
 
             <View className="flex-1">
                 <Text className="text-[13px] text-gray70">{'마음일기'}</Text>
-                <Text>{`${item.name}님이 ${emotionKorMap[item.top_emotion]} 상태에요!`}</Text>
+                <Text>{`${item.name}님이 ${emotionKorMap[item.top_emotion === 'fear' ? 'anxiety' : item.top_emotion ?? 'unknown']} 상태에요!`}</Text>
             </View>
             <View className="items-start h-full">
                 <Text className="text-[13px] text-gray70">{formatDate(item.created_at)}</Text>
@@ -32,7 +32,7 @@ export default function NotificationsScreen() {
         ...queries.care.notifications(userInfo?.data?.username ?? ''),
         enabled: !!userInfo?.data?.username,
     });
-
+    console.log({ notifications: notifications?.notifications.map((notification) => notification.top_emotion) });
 
 
 

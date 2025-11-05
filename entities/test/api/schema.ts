@@ -10,10 +10,9 @@ export interface VoiceAnalyzePreviewResponse {
   sad_bps: number;
   neutral_bps: number;
   angry_bps: number;
-  fear_bps: number;
+  anxiety_bps: number;
   surprise_bps: number;
   top_emotion?: string | null;
   top_confidence_bps?: number | null;
   model_version?: string | null;
 }
-

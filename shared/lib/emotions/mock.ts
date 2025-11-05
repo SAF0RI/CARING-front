@@ -1,4 +1,5 @@
 import { Emotion } from "@/entities/voices/api/schema";
+
 export const emotionCharacteristics: Record<Emotion, string[]> = {
   unknown: ["데이터가 없습니다."],
   happy: [
@@ -16,8 +17,9 @@ export const emotionCharacteristics: Record<Emotion, string[]> = {
     "#말의 속도가 빨라졌다 느려졌다 해요",
     "#음량이 크게 변해요",
   ],
+  fear: ["#말의 속도가 불규칙해요", "#음성이 떨려요", "#음높이가 불안정해요"],
   sad: ["#음높이가 낮아요", "#말의 속도가 느려요", "#음량이 작고 흐려요"],
-  fear: [
+  anxiety: [
     "#말의 속도가 불규칙해요",
     "#음성이 떨려요",
     "#음높이가 불안정해요",

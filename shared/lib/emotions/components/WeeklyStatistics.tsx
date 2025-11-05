@@ -100,7 +100,7 @@ export const WeeklyStatistics = ({
     "neutral",
     "surprise",
     "sad",
-    "fear",
+    "anxiety",
     "angry",
   ];
   // 고정 높이 기반 레이아웃: h-64(=256), 하단 날짜 영역(외부 pb-8 32 + 내부 paddingBottom 32)

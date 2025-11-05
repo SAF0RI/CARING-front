@@ -55,7 +55,7 @@ export const MonthlyFrequencyStatistics = ({
     surprise: frequency.surprise || 0,
     sad: frequency.sad || 0,
     neutral: frequency.neutral || 0,
-    fear: frequency.fear || 0,
+    anxiety: frequency.anxiety || 0,
     angry: frequency.angry || 0,
     unknown: frequency.unknown || 0,
   };
@@ -74,7 +74,7 @@ export const MonthlyFrequencyStatistics = ({
     "neutral",
     "surprise",
     "sad",
-    "fear",
+    "anxiety",
     "angry",
   ];
 

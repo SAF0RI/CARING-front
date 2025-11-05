@@ -60,7 +60,7 @@ export default function HomeScreen() {
                 }
             >
                 {/* 상단 감정 컴포넌트 */}
-                <View className={cn(['flex-row w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px] px-4', emotionBgColorMap['fear']])}>
+                <View className={cn(['flex-row w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px] px-4', emotionBgColorMap['anxiety']])}>
                     <EmotionIconComponent emotion={topEmotion?.top_emotion ?? 'unknown'} isBig={true} />
                     <View className="flex-col items-start justify-center mx-4 gap-y-1">
                         <Text className="text-gray90 text-[19px]">{`오늘 ${topEmotion?.user_name ?? ''}님이`}</Text>

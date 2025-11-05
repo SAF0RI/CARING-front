@@ -3,7 +3,7 @@ import { removeLocalUserInfo } from "@/entities/user/api/storage";
 import { deactivateFcmTokenFromServer } from "@/shared/lib/fcm/token-management";
 import { Button, Icon, MainHeader, MainLayout } from "@/shared/ui";
 import { cn } from "@/shared/util/style";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ActivityIndicator, Alert, Text, View } from "react-native";
 
@@ -18,6 +18,34 @@ export default function AccountScreen(
         enabled: !!userInfo?.data?.username,
     });
 
+    const { mutateAsync } = useMutation({
+        mutationFn: async () => {
+            if (userInfo?.data?.username) {
+                await deactivateFcmTokenFromServer(userInfo.data.username);
+            }
+        },
+    });
+
+    const { mutate: removeLocalUserInfoMutation, isPending: isRemoveLocalUserInfoPending } = useMutation({
+        mutationFn: async () => {
+            try {
+                if (userInfo?.data?.username) {
+                    await mutateAsync();
+                }
+            } catch (error) {
+                console.error("FCM 토큰 비활성화 실패:", error);
+            }
+            await removeLocalUserInfo();
+            router.replace("/login");
+        },
+        onSuccess: () => {
+            router.replace("/login");
+        },
+        onError: (error) => {
+            console.error("로그아웃 실패:", error);
+            Alert.alert("로그아웃 실패", "다시 시도해주세요.");
+        },
+    });
     return (
         <MainLayout>
             <MainLayout.Header>
@@ -47,20 +75,8 @@ export default function AccountScreen(
                         <Text className="text-gray90 text-[19px]">아이디</Text>
                         <Text className="text-gray90 text-[19px]">{userPageInfo?.data?.username}</Text>
                     </View>
-                    <Button onPress={async () => {
-                        try {
-                            if (userInfo?.data?.username) {
-                                await deactivateFcmTokenFromServer(userInfo.data.username);
-                            }
-                        } catch (error) {
-                            console.error("FCM 토큰 비활성화 실패:", error);
-                            Alert.alert("FCM 토큰 비활성화 실패", "다시 시도해주세요.");
-                        }
-
-                        await removeLocalUserInfo();
-                        router.replace("/login");
-                    }} size="md" variant="text" className="self-start mt-4">
-                        <Text className="text-gray50">로그아웃하기 <ActivityIndicator size="small" color="gray" /></Text>
+                    <Button onPress={() => removeLocalUserInfoMutation()} size="md" variant="text" className="self-start mt-4">
+                        <Text className="text-gray50">로그아웃하기 {isRemoveLocalUserInfoPending ? <ActivityIndicator size="small" color="gray" /> : null}</Text>
                     </Button>
                 </View>
             </MainLayout.Content>
