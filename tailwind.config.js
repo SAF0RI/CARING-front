@@ -87,20 +87,22 @@ module.exports = {
         blue100: "#B9C8FE",
         blue50: "#E8EDFF",
 
+        point900: "#694113",
+        point800: "#8A5519",
+        point700: "#B26E20",
+        point600: "#E48D29",
+        point500: "#FB9B2D",
+        point400: "#FCAF57",
+        point300: "#FCBC72",
+        point200: "#FDD19E",
+        point100: "#FEE0BE",
+        point50: "#FFF5EA",
+
         primary: "#152C4A",
         main: "#0C54B0",
         disabled: "#D8D8D8",
 
         white: "#FFFFFF",
-
-        anxietyBg: "#FDE6E6",
-        anxietyText: "#640000",
-        calmBg: "#EBFAEB",
-        calmText: "#249224",
-        happyBg: "#FFF5EA",
-        happyText: "#B26E20",
-        sadBg: "#EAF0F7",
-        sadText: "#152C4A",
       },
       fontSize: {
         sm: "13px",

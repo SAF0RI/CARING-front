@@ -1,18 +1,23 @@
 import { Icon } from "@/shared/ui/svg/SvgIcon";
 import { Tabs } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function UserTabsLayout() {
+    const insets = useSafeAreaInsets();
     return (
         <Tabs screenOptions={{
             headerShown: false,
             tabBarActiveTintColor: "#152C4A",
             tabBarInactiveTintColor: "#D8D8D8",
+            tabBarStyle: {
+                paddingBottom: insets.bottom,
+            },
         }}
         >
             <Tabs.Screen
                 name="diary-list"
                 options={{
-                    title: "일기 리스트",
+                    title: "일기 목록",
                     tabBarIcon: ({ focused }) => (
                         <Icon
                             name={focused ? "ListActive" : "ListDisabled"}

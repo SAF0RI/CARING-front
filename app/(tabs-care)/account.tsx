@@ -1,18 +1,87 @@
+import { queries } from "@/entities";
 import { removeLocalUserInfo } from "@/entities/user/api/storage";
-import { Button } from "@/shared/ui";
+import { deactivateFcmTokenFromServer } from "@/shared/lib/fcm/token-management";
+import { Button, Icon, MainHeader, MainLayout } from "@/shared/ui";
+import { cn } from "@/shared/util/style";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Alert, Text, View } from "react-native";
 
-export default function AccountScreen() {
+export default function AccountScreen(
+
+) {
+
+    const userInfo = useQuery(queries.user.userInfo);
+
+    const userPageInfo = useQuery({
+        ...queries.care.careUserInfo(userInfo?.data?.username ?? ""),
+        enabled: !!userInfo?.data?.username,
+    });
+
+    const { mutateAsync } = useMutation({
+        mutationFn: async () => {
+            if (userInfo?.data?.username) {
+                await deactivateFcmTokenFromServer(userInfo.data.username);
+            }
+        },
+    });
+
+    const { mutate: removeLocalUserInfoMutation, isPending: isRemoveLocalUserInfoPending } = useMutation({
+        mutationFn: async () => {
+            try {
+                if (userInfo?.data?.username) {
+                    await mutateAsync();
+                }
+            } catch (error) {
+                console.error("FCM 토큰 비활성화 실패:", error);
+            }
+            await removeLocalUserInfo();
+            router.replace("/login");
+        },
+        onSuccess: () => {
+            router.replace("/login");
+        },
+        onError: (error) => {
+            console.error("로그아웃 실패:", error);
+            Alert.alert("로그아웃 실패", "다시 시도해주세요.");
+        },
+    });
     return (
-        <View className="flex-1 items-center justify-center bg-white">
-            <Button onPress={async () => {
-                await removeLocalUserInfo();
-                router.replace("/login");
-            }} size="md" variant="outlined">
-                <Text className="text-primary">로그아웃</Text>
-            </Button>
-        </View>
+        <MainLayout>
+            <MainLayout.Header>
+                <MainHeader title="내 정보" />
+            </MainLayout.Header>
+            <MainLayout.Content className="bg-gray5 flex-1 p-4 mx-0 px-0 py-0" footer={false}>
+                <View className={cn(['flex-col w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px] px-4'])}>
+                    {userPageInfo?.data?.connected_user_name ? (
+                        <>
+                            <Icon name="ConnectIcon" size={24} />
+                            <Text className="text-gray90 text-[19px]"><Text className="text-main600 text-[19px] font-bold">{userPageInfo?.data?.connected_user_name}</Text>님이</Text>
+                            <Text className="text-gray90 text-[19px]">피보호자로 연결되어 있습니다!</Text>
+                        </>
+                    ) : (
+                        <Text className="text-gray90 text-[19px]">피보호자가 연결되어 있지 않습니다!</Text>
+                    )
+                    }
+
+                </View>
+                <View className="flex-col gap-y-4 px-4 py-4 h-full">
+                    <Text className="text-gray90 text-[19px] font-bold">개인정보</Text>
+                    <View className="flex-row items-center gap-x-2 bg-white rounded-lg p-4">
+                        <Icon name="UserEmptyIcon" size={32} />
+                        <Text className="text-gray90 text-[19px]">{userPageInfo?.data?.name}</Text>
+                    </View>
+                    <View className="flex-col items-start gap-x-2 gap-y-1 bg-white rounded-lg p-4">
+                        <Text className="text-gray90 text-[19px]">아이디</Text>
+                        <Text className="text-gray90 text-[19px]">{userPageInfo?.data?.username}</Text>
+                    </View>
+                    <Button onPress={() => removeLocalUserInfoMutation()} size="md" variant="text" className="self-start mt-4">
+                        <Text className="text-gray50">로그아웃하기 {isRemoveLocalUserInfoPending ? <ActivityIndicator size="small" color="gray" /> : null}</Text>
+                    </Button>
+                </View>
+            </MainLayout.Content>
+        </MainLayout >
+
     );
 }
 

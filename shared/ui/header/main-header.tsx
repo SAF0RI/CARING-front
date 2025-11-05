@@ -10,7 +10,7 @@ type HeaderProps = {
 export const MainHeader = ({ title, rightComponent }: HeaderProps) => {
 
     return (
-        <View className="w-full h-16 bg-white shadow-md border-b-[1px] border-gray10">
+        <View className="w-full h-16 bg-white shadow-bottom-md border-b-[1px] border-gray10">
             <TouchableOpacity className="absolute left-4 h-16 flex justify-center">
                 <Icon name="HeaderLogo" />
             </TouchableOpacity>

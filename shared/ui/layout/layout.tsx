@@ -1,5 +1,6 @@
 import { cn } from "@/shared/util/style";
-import { ScrollView, View, ViewProps } from "react-native";
+import { ScrollView, ScrollViewProps, StyleProp, View, ViewProps, ViewStyle } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Footer } from "../footer";
 
 export type LayoutProps = {
@@ -7,11 +8,20 @@ export type LayoutProps = {
     className?: string;
     footer?: boolean;
     isScrollable?: boolean;
-} & ViewProps;
+    style?: StyleProp<ViewStyle>;
+} & ViewProps & ScrollViewProps;
 
-export const MainLayout = ({ children, className, ...props }: LayoutProps) => {
+export const MainLayout = ({ children, className, style, ...props }: LayoutProps) => {
+
+    const insets = useSafeAreaInsets();
+
     return (
-        <View className={cn("flex-1 items-center justify-start bg-white w-full", className)} {...props}>
+        <View className={cn("flex-1 items-center justify-start bg-white w-full", className)} style={{
+            paddingTop: insets.top,
+            paddingLeft: insets.left,
+            paddingRight: insets.right,
+            ...(style as object)
+        } as ViewStyle} {...props}>
             {children}
         </View>
     );

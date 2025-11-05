@@ -1,12 +1,17 @@
 import { Icon } from "@/shared/ui/svg/SvgIcon";
 import { Tabs } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function CareTabsLayout() {
+    const insets = useSafeAreaInsets();
     return (
         <Tabs screenOptions={{
             headerShown: false,
             tabBarActiveTintColor: "#152C4A",
             tabBarInactiveTintColor: "#D8D8D8",
+            tabBarStyle: {
+                paddingBottom: insets.bottom,
+            },
         }}
         >
             <Tabs.Screen
@@ -24,7 +29,7 @@ export default function CareTabsLayout() {
             <Tabs.Screen
                 name="diary-list"
                 options={{
-                    title: "리스트",
+                    title: "일기 목록",
                     tabBarIcon: ({ focused }) => (
                         <Icon
                             name={focused ? "ListActive" : "ListDisabled"}
@@ -39,7 +44,7 @@ export default function CareTabsLayout() {
                     title: "리포트",
                     tabBarIcon: ({ focused }) => (
                         <Icon
-                            name={focused ? "NoteActive" : "NoteDisabled"}
+                            name={focused ? "ChartIcon" : "ChartDisabledIcon"}
                             size={24}
                         />
                     ),

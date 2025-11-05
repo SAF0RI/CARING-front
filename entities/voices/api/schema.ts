@@ -7,12 +7,12 @@ export interface RNFileParam {
 
 export type Emotion =
   | "unknown"
-  | "anxiety"
-  | "calm"
+  | "surprise"
+  | "neutral"
   | "happy"
   | "sad"
-  | "surprise";
-
+  | "anxiety"
+  | "angry";
 // Upload voice with question (multipart/form-data + optional username query)
 export interface UploadVoiceWithQuestionRequest {
   file: RNFileParam;
@@ -34,6 +34,7 @@ export interface VoiceListItem {
   emotion?: Emotion | null;
   question_title?: string | null;
   content: string;
+  s3_url: string;
 }
 
 export interface UserVoiceListResponse {
@@ -48,6 +49,7 @@ export interface UserVoiceDetailResponse {
   top_emotion?: Emotion | null;
   created_at: string;
   voice_content?: string | null;
+  s3_url: string;
 }
 
 // Backward-compatible simple upload (without question). Keep if referenced elsewhere.
@@ -60,4 +62,23 @@ export interface UploadVoiceResponse {
   message: string;
   voiceId?: string;
   fileUrl?: string;
+}
+
+export interface VoiceAnalyzePreviewRequest {
+  voice_id: number;
+  care_username: string;
+}
+
+export interface VoiceAnalyzePreviewResponse {
+  username: string;
+  created_at: string;
+  voice_id?: number | null;
+  happy_pct: number;
+  sad_pct: number;
+  neutral_pct: number;
+  angry_pct: number;
+  fear_pct: number;
+  surprise_pct: number;
+  top_emotion?: string | null;
+  top_emotion_confidence_pct?: number | null;
 }

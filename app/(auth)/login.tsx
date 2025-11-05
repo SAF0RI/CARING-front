@@ -2,20 +2,39 @@ import { queries } from "@/entities";
 import { signIn } from "@/entities/user/api";
 import { Role, UserInfo } from "@/entities/user/api/schema";
 import { setLocalUserInfo } from "@/entities/user/api/storage";
+import { registerFcmTokenToServer, retryPendingDeactivate } from "@/shared/lib/fcm/token-management";
 import { Button } from "@/shared/ui/buttons";
 import { LoginInput } from "@/shared/ui/input";
 import { Icon } from "@/shared/ui/svg";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 
 export default function LoginScreen() {
 
     const router = useRouter();
     const queryClient = useQueryClient();
+
+    // 컴포넌트 마운트 시 pending deactivate 요청 재시도
+    useEffect(() => {
+        (async () => {
+            try {
+                const result = await retryPendingDeactivate();
+                if (result.success) {
+                    console.log("Pending FCM 토큰 비활성화 재시도 성공");
+                } else {
+                    console.error("Pending FCM 토큰 비활성화 재시도 실패:", result.error);
+                }
+            } catch (error) {
+                console.error("Pending FCM 토큰 비활성화 재시도 중 오류:", error);
+            }
+        })();
+    }, []);
 
     const { control, handleSubmit, setValue, formState: { errors } } = useForm<{ username: string; password: string; role: Role }>({
         defaultValues: {
@@ -42,9 +61,14 @@ export default function LoginScreen() {
             };
 
             await setLocalUserInfo(userInfo);
-            
-            // React Query 캐시에 userInfo 업데이트
+
             queryClient.setQueryData(queries.user.userInfo.queryKey, userInfo);
+
+            try {
+                await registerFcmTokenToServer(data.username);
+            } catch (error) {
+                console.error("FCM 토큰 등록 실패:", error);
+            }
 
             if (data.role === Role.CARE) {
                 router.replace("/(tabs-care)/home");
@@ -52,9 +76,6 @@ export default function LoginScreen() {
                 router.replace("/(tabs-user)/diary-list");
             }
 
-        },
-        onError: () => {
-            Alert.alert("로그인 실패", "아이디와 비밀번호를 확인해주세요.");
         }
     });
 
@@ -64,8 +85,17 @@ export default function LoginScreen() {
         defaultValue: Role.USER,
     });
 
+    const insets = useSafeAreaInsets();
+
     return (
-        <View className="flex items-center justify-start px-4 pt-20 h-full w-full gap-4">
+        <View className="flex items-center justify-start px-4 pt-20 h-full w-full gap-4"
+            style={{
+                paddingTop: insets.top + 80,
+                paddingLeft: insets.left + 16,
+                paddingBottom: insets.bottom,
+                paddingRight: insets.right + 16,
+            }}
+        >
             <Image
                 source={require('@/assets/images/img_logo_header.png')}
                 className="h-16 w-full mt-16 mb-10"

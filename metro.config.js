@@ -18,4 +18,18 @@ config.resolver = {
   },
 };
 
+// InternalBytecode.js 심볼리케이션 에러 방지
+config.server = {
+  ...config.server,
+  enhanceMiddleware: (middleware) => {
+    return (req, res, next) => {
+      // InternalBytecode.js 관련 요청은 무시
+      if (req.url && req.url.includes("InternalBytecode.js")) {
+        return res.status(404).end();
+      }
+      return middleware(req, res, next);
+    };
+  },
+};
+
 module.exports = withNativeWind(config, { input: "./index.css" });

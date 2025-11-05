@@ -10,6 +10,8 @@ import {
   UploadVoiceWithQuestionRequest,
   UserVoiceDetailResponse,
   UserVoiceListResponse,
+  VoiceAnalyzePreviewRequest,
+  VoiceAnalyzePreviewResponse,
   VoiceQuestionUploadResponse,
 } from "./schema";
 
@@ -69,10 +71,17 @@ export const uploadVoiceWithQuestion = async ({
 
 // GET /users/voices?username=...
 export const getUserVoiceList = async (
-  username: string
+  username: string,
+  date?: Date | string | null
 ): Promise<UserVoiceListResponse> => {
+  const yyyyMMdd = (() => {
+    if (!date) return "";
+    if (typeof date === "string") return date; // expect 'YYYY-MM-DD'
+    return date.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+  })();
+
   const response = await GetAxiosInstance<UserVoiceListResponse>(
-    `/users/voices?username=${encodeURIComponent(username)}`
+    `/users/voices?username=${encodeURIComponent(username)}${yyyyMMdd ? `&date=${encodeURIComponent(yyyyMMdd)}` : ""}`
   );
   return response.data;
 };
@@ -95,6 +104,16 @@ export const deleteUserVoice = async (
 ): Promise<Record<string, any>> => {
   const response = await DeleteAxiosInstance<Record<string, any>>(
     `/users/voices/${voiceId}?username=${encodeURIComponent(username)}`
+  );
+  return response.data;
+};
+
+export const getVoiceAnalyzePreview = async ({
+  voice_id,
+  care_username,
+}: VoiceAnalyzePreviewRequest): Promise<VoiceAnalyzePreviewResponse> => {
+  const response = await GetAxiosInstance<VoiceAnalyzePreviewResponse>(
+    `/care/voices/${voice_id}/composite?care_username=${encodeURIComponent(care_username)}`
   );
   return response.data;
 };
