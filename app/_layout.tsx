@@ -12,12 +12,18 @@ import {
   useRootNavigationState,
   useSegments,
 } from "expo-router";
+import * as Updates from 'expo-updates';
 import { useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../index.css";
 
 export default function RootLayout() {
+
+  useEffect(() => {
+    Alert.alert('channel:', Updates.channel ?? '');
+  }, []);
+
   useInAppUpdates();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
