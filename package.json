@@ -11,7 +11,10 @@
     "lint": "expo lint",
     "prebuild:android": "expo prebuild -p android --clean",
     "build:apk": "./scripts/build-release-apk.sh",
-    "prepare": "husky"
+    "prepare": "husky",
+    "update:dev": "eas update --branch development --message 'dev OTA'",
+    "update:preview": "eas update --branch preview --message 'preview OTA'",
+    "update:prod": "eas update --branch production --message 'prod OTA'"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -30,6 +33,7 @@
     "clsx": "^2.1.1",
     "expo": "~54.0.12",
     "expo-audio": "~1.0.13",
+    "expo-build-properties": "~1.0.9",
     "expo-clipboard": "~8.0.7",
     "expo-constants": "~18.0.9",
     "expo-dev-client": "~6.0.13",
@@ -47,6 +51,7 @@
     "expo-symbols": "~1.0.7",
     "expo-system-ui": "~6.0.7",
     "expo-task-manager": "~14.0.7",
+    "expo-updates": "^29.0.12",
     "expo-web-browser": "~15.0.8",
     "nativewind": "^4.2.1",
     "prettier-plugin-tailwindcss": "^0.5.14",

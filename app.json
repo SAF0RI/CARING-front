@@ -3,10 +3,19 @@
     "name": "caring",
     "slug": "caring",
     "version": "1.0.2",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "caring",
     "userInterfaceStyle": "automatic",
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/265077ca-4073-4fc9-a0e6-4473fd0b1185"
+    },
     "androidStatusBar": {
       "backgroundColor": "#FFFFFF",
       "barStyle": "dark-content",
@@ -33,7 +42,13 @@
       "predictiveBackGestureEnabled": false,
       "usesCleartextTraffic": true,
       "package": "com.phobipark.caring",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "output": "static",
@@ -78,7 +93,15 @@
         }
       ],
       "expo-audio",
-      "./plugins/with-network-security-config"
+      "./plugins/with-network-security-config",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "2.0.21"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

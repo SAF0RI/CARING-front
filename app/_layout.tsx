@@ -3,6 +3,7 @@ import type { UserInfo } from "@/entities/user/api/schema";
 import { Role } from "@/entities/user/api/schema";
 import { getLocalUserInfo } from "@/entities/user/api/storage";
 import { FcmProvider } from "@/shared/lib/fcm";
+import { useInAppUpdates } from "@/shared/lib/useInAppUpdates";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import {
@@ -17,6 +18,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../index.css";
 
 export default function RootLayout() {
+  useInAppUpdates();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
@@ -46,7 +48,7 @@ export default function RootLayout() {
                 Alert.alert(
                   "오류",
                   error.response?.data?.message ??
-                    "알 수 없는 오류가 발생했습니다."
+                  "알 수 없는 오류가 발생했습니다."
                 );
               } else {
                 Alert.alert(

@@ -17,7 +17,7 @@ export default function UserTabsLayout() {
             <Tabs.Screen
                 name="diary-list"
                 options={{
-                    title: "일기 목록",
+                    title: "일기 리스트",
                     tabBarIcon: ({ focused }) => (
                         <Icon
                             name={focused ? "ListActive" : "ListDisabled"}
