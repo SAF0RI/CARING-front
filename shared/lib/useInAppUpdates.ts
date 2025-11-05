@@ -2,24 +2,28 @@ import * as Updates from "expo-updates";
 import { useEffect } from "react";
 import { Alert, AppState } from "react-native";
 
-export function useInAppUpdates(): void {
+export function useInAppUpdates() {
   useEffect(() => {
-    const subscription = AppState.addEventListener("change", async (state) => {
-      if (state !== "active") return;
+    const sub = AppState.addEventListener("change", async (s) => {
+      if (s !== "active") return;
       try {
-        const update = await Updates.checkForUpdateAsync();
-        if (update.isAvailable) {
-          await Updates.fetchUpdateAsync();
-          Alert.alert("업데이트", "새 버전이 있어요. 지금 적용할까요?", [
-            { text: "나중에" },
-            { text: "지금", onPress: () => Updates.reloadAsync() },
-          ]);
-        }
-      } catch {
-        // ignore transient errors
-      }
+        // 함수 존재 여부 방어
+        if (
+          !Updates?.checkForUpdateAsync ||
+          !Updates?.fetchUpdateAsync ||
+          !Updates?.reloadAsync
+        )
+          return;
+        const res = await Updates.checkForUpdateAsync();
+        if (!res?.isAvailable) return;
+        await Updates.fetchUpdateAsync();
+        // 프롬프트 없이 다음 실행 시 적용하려면 아래만: return;
+        Alert.alert("업데이트", "새 버전이 있어요. 지금 적용할까요?", [
+          { text: "나중에" },
+          { text: "지금", onPress: () => Updates.reloadAsync() },
+        ]);
+      } catch {}
     });
-
-    return () => subscription.remove();
+    return () => sub.remove?.();
   }, []);
 }
