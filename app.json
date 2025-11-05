@@ -78,7 +78,8 @@
         }
       ],
       "expo-audio",
-      "./plugins/with-network-security-config"
+      "./plugins/with-network-security-config",
+      "./plugins/with-firebase-notification-config"
     ],
     "experiments": {
       "typedRoutes": true,
