@@ -6,9 +6,9 @@ import {
 } from "./handler";
 
 export const voicesQueries = createQueryKeys("voices", {
-  userVoiceList: (username: string) => ({
-    queryKey: [username],
-    queryFn: () => getUserVoiceList(username),
+  userVoiceList: (username: string, date?: Date | string | null) => ({
+    queryKey: [username, date ?? "all"],
+    queryFn: () => getUserVoiceList(username, date),
   }),
   userVoiceDetail: (voiceId: number, username: string) => ({
     queryKey: [voiceId, username],

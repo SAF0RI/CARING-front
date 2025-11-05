@@ -5,7 +5,7 @@ import { EmotionIconComponent } from "@/shared/lib/emotions/components";
 import { BackHeader, MainLayout } from "@/shared/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { RefreshControl, Text, View } from "react-native";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 
 const formatDateSimple = (isoString: string) => {
     const date = new Date(isoString);
@@ -24,9 +24,6 @@ export default function DiaryDetailScreen() {
         ...queries.voices.voiceAnalyzePreview(Number(id), userInfo?.username ?? ''),
         enabled: !!id && !!userInfo?.username,
     });
-
-    console.log({ diary });
-
 
     const currentDiary = diary?.voice_id === Number(id) ? diary : null;
     const topEmotion = (currentDiary?.top_emotion ?? null) as Emotion | null;
@@ -51,77 +48,80 @@ export default function DiaryDetailScreen() {
             </MainLayout.Header>
 
             <MainLayout.Content
-                isScrollable={true}
                 className="bg-gray5 flex-1 p-4"
                 footer={false}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={Boolean(isFetching || isRefetching)}
-                        onRefresh={refetch}
-                    />
-                }
             >
-                <View className="bg-white rounded-[20px] p-6 gap-y-6">
-                    <Text className="text-gray90 text-[15px] font-semibold w-full text-left">
-                        {diary?.created_at ? formatDateSimple(diary.created_at) : '-'}
-                    </Text>
-
-                    <View className="flex-row items-center gap-x-2">
-                        <EmotionIconComponent
-                            emotion={(topEmotion === 'fear' ? 'anxiety' : topEmotion) ?? 'unknown'}
-                            isBig={false}
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={Boolean(isFetching || isRefetching)}
+                            onRefresh={refetch}
                         />
-                        <Text className="text-gray90 text-[19px] font-bold">
-                            {diary?.username ?? '사용자'} 님이 {'\n'}
-                            {emotionKorMap[topEmotion === 'fear' ? 'anxiety' : topEmotion ?? 'unknown']} 상태예요!
+                    }
+                >
+                    <View className="bg-white rounded-[20px] p-6 gap-y-6">
+                        <Text className="text-gray90 text-[15px] font-semibold w-full text-left">
+                            {diary?.created_at ? formatDateSimple(diary.created_at) : '-'}
                         </Text>
-                    </View>
 
-                    <View className="gap-y-3">
-                        {emotionCharacteristics?.map((characteristic: string, index: number) => (
-                            <View
-                                key={index}
-                                className="bg-gray10 rounded-[12px] px-4 py-1"
-                            >
-                                <Text className="text-gray90 text-[15px]">
-                                    {characteristic}
-                                </Text>
-                            </View>
-                        ))}
-                    </View>
+                        <View className="flex-row items-center gap-x-2">
+                            <EmotionIconComponent
+                                emotion={(topEmotion === 'fear' ? 'anxiety' : topEmotion) ?? 'unknown'}
+                                isBig={false}
+                            />
+                            <Text className="text-gray90 text-[19px] font-bold">
+                                {diary?.username ?? '사용자'} 님이 {'\n'}
+                                {emotionKorMap[topEmotion === 'fear' ? 'anxiety' : topEmotion ?? 'unknown']} 상태예요!
+                            </Text>
+                        </View>
 
-                    <View className="h-px bg-gray10" />
-
-                    <View className="gap-y-4">
-                        {emotionOrder.map((emotion) => {
-                            const percentage = Math.round(emotionPercentages[emotion] ?? 0);
-                            const color = emotionRawColorMap[emotion] ?? "#C7C7CC";
-                            const emotionName = emotionKorMap[emotion] ?? '분석 중';
-
-                            return (
-                                <View key={emotion} className="flex-row items-center gap-x-3">
-                                    <Text className="text-gray90 text-[15px] font-semibold w-16">
-                                        {emotionName}
-                                    </Text>
-                                    <View className="flex-1 h-6 bg-gray10 rounded-full overflow-hidden">
-                                        <View
-                                            style={{
-                                                width: `${percentage}%`,
-                                                backgroundColor: color,
-                                                height: '100%',
-                                            }}
-                                        />
-                                    </View>
-                                    <Text className="text-gray90 text-[15px] font-semibold w-12 text-right">
-                                        {percentage}%
+                        <View className="gap-y-3">
+                            {emotionCharacteristics?.map((characteristic: string, index: number) => (
+                                <View
+                                    key={index}
+                                    className="bg-gray10 rounded-[12px] px-4 py-1"
+                                >
+                                    <Text className="text-gray90 text-[15px]">
+                                        {characteristic}
                                     </Text>
                                 </View>
-                            );
-                        })}
+                            ))}
+                        </View>
+
+                        <View className="h-px bg-gray10" />
+
+                        <View className="gap-y-4">
+                            {emotionOrder.map((emotion) => {
+                                const percentage = Math.round(emotionPercentages[emotion] ?? 0);
+                                const color = emotionRawColorMap[emotion] ?? "#C7C7CC";
+                                const emotionName = emotionKorMap[emotion] ?? '분석 중';
+
+                                return (
+                                    <View key={emotion} className="flex-row items-center gap-x-3">
+                                        <Text className="text-gray90 text-[15px] font-semibold w-16">
+                                            {emotionName}
+                                        </Text>
+                                        <View className="flex-1 h-6 bg-gray10 rounded-full overflow-hidden">
+                                            <View
+                                                style={{
+                                                    width: `${percentage}%`,
+                                                    backgroundColor: color,
+                                                    height: '100%',
+                                                }}
+                                            />
+                                        </View>
+                                        <Text className="text-gray90 text-[15px] font-semibold w-12 text-right">
+                                            {percentage}%
+                                        </Text>
+                                    </View>
+                                );
+                            })}
+                        </View>
+
+
                     </View>
-
-
-                </View>
+                </ScrollView>
             </MainLayout.Content>
         </MainLayout >
     );

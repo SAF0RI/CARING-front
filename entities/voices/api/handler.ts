@@ -71,10 +71,17 @@ export const uploadVoiceWithQuestion = async ({
 
 // GET /users/voices?username=...
 export const getUserVoiceList = async (
-  username: string
+  username: string,
+  date?: Date | string | null
 ): Promise<UserVoiceListResponse> => {
+  const yyyyMMdd = (() => {
+    if (!date) return "";
+    if (typeof date === "string") return date; // expect 'YYYY-MM-DD'
+    return date.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+  })();
+
   const response = await GetAxiosInstance<UserVoiceListResponse>(
-    `/users/voices?username=${encodeURIComponent(username)}`
+    `/users/voices?username=${encodeURIComponent(username)}${yyyyMMdd ? `&date=${encodeURIComponent(yyyyMMdd)}` : ""}`
   );
   return response.data;
 };

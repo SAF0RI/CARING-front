@@ -29,7 +29,7 @@ export default function CareTabsLayout() {
             <Tabs.Screen
                 name="diary-list"
                 options={{
-                    title: "리스트",
+                    title: "일기 목록",
                     tabBarIcon: ({ focused }) => (
                         <Icon
                             name={focused ? "ListActive" : "ListDisabled"}

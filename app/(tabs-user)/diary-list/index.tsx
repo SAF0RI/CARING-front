@@ -1,13 +1,15 @@
 import { useAudioPlayer } from "@/shared/lib/hooks/useAudioPlayer";
-import { AudioControlButton, Button, Footer, HelpButton, MainHeader, MainLayout } from "@/shared/ui";
+import { AudioControlButton, Button, Footer, Icon, MainHeader, MainLayout } from "@/shared/ui";
 
 import { queries } from "@/entities";
 import { VoiceListItem } from "@/entities/voices/api/schema";
 import { EmotionComponentWithText } from "@/shared/lib/emotions/components";
 import { formatDate } from "@/shared/util/format";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { ActivityIndicator, FlatList, RefreshControl, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, FlatList, Platform, RefreshControl, Text, TouchableOpacity, View } from "react-native";
 
 type DiaryListCardProps = {
     diary: VoiceListItem;
@@ -15,6 +17,11 @@ type DiaryListCardProps = {
     isBuffering?: boolean;
     onPress: () => void;
 }
+
+const formatDateSimple = (isoString: string) => {
+    const date = new Date(isoString);
+    return `${date.getFullYear()}년 ${(date.getMonth() + 1).toString().padStart(2, "0")}월 ${date.getDate().toString().padStart(2, "0")}일`;
+};
 
 const DiaryListCard = ({ diary, isPlaying, isBuffering = false, onPress }: DiaryListCardProps) => {
 
@@ -51,8 +58,13 @@ export default function DiaryListScreen() {
 
     const { data: userInfo } = useQuery(queries.user.userInfo);
 
+
+
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
     const { data: diaries, refetch, isLoading } = useQuery({
-        ...queries.voices.userVoiceList(userInfo?.username ?? ''),
+        ...queries.voices.userVoiceList(userInfo?.username ?? '', selectedDate ?? undefined),
         enabled: !!userInfo?.username,
     });
 
@@ -68,6 +80,29 @@ export default function DiaryListScreen() {
         }
     };
 
+    const handleDateChange = (event: any, date?: Date) => {
+        if (Platform.OS === 'android') {
+            setShowDatePicker(false);
+            if (event.type === 'dismissed') {
+                return;
+            }
+        }
+        if (Platform.OS === 'ios') {
+            if (event.type === 'dismissed') {
+                setShowDatePicker(false);
+                return;
+            }
+        }
+        if (date) {
+            setSelectedDate(date);
+            if (Platform.OS === 'ios') {
+                setShowDatePicker(false);
+            }
+        }
+    };
+    const handleCalendarPress = () => {
+        setShowDatePicker(true);
+    };
 
     const renderDiaryCard = ({ item }: { item: VoiceListItem }) => {
         const isCurrentlyPlaying = isPlaying(item.voice_id.toString());
@@ -88,8 +123,28 @@ export default function DiaryListScreen() {
             <MainLayout.Header>
                 <MainHeader
                     title="일기 목록"
-                    rightComponent={<HelpButton />}
+                    rightComponent={
+                        <Button
+                            size="md"
+                            variant="text"
+                            layoutClassName="w-fit"
+                            innerClassName="flex-row items-center gap-x-2"
+                            onPress={handleCalendarPress}
+                        >
+                            <Text className="text-gray100 text-[15px] font-semibold">날짜 검색</Text>
+                            <Icon name="CalendarIcon" size={24} />
+                        </Button>
+                    }
                 />
+                {showDatePicker && (
+                    <DateTimePicker
+                        value={selectedDate ?? new Date()}
+                        mode="date"
+                        display={Platform.OS === 'ios' ? 'default' : 'default'}
+                        onChange={handleDateChange}
+                        maximumDate={new Date()}
+                    />
+                )}
             </MainLayout.Header>
 
             <MainLayout.Content className="bg-gray5 flex-1 p-0" footer={false}>
@@ -105,23 +160,32 @@ export default function DiaryListScreen() {
                         renderItem={renderDiaryCard}
                         ItemSeparatorComponent={() => <View className="h-5" />}
                         keyExtractor={(item) => item.voice_id.toString()}
-                        ListHeaderComponent={() => <View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px]">
-                            <Text className="text-gray90 text-[15px]">나를 더 알아가는 시간</Text>
-                            <Text className="text-xl font-bold">
-                                <Text className="text-main700">내 마음</Text>은 어땠을까요?
-                            </Text>
-                            <Button
-                                size="md"
-                                variant="filled"
-                                className="mx-20 mt-4"
-                                hasArrow
-                                onPress={() => router.push('/diary-list/analysis')}
-                            >
-                                <Text className="text-white font-bold text-[17px]">분석 결과 보기</Text>
-                            </Button>
-                        </View>}
+                        ListHeaderComponent={() =>
+                            <><View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px]">
+                                <Text className="text-gray90 text-[15px]">나를 더 알아가는 시간</Text>
+                                <Text className="text-xl font-bold">
+                                    <Text className="text-main700">내 마음</Text>은 어땠을까요?
+                                </Text>
+                                <Button
+                                    size="md"
+                                    variant="filled"
+                                    className="mx-20 mt-4"
+                                    hasArrow
+                                    onPress={() => router.push('/diary-list/analysis')}
+                                >
+                                    <Text className="text-white font-bold text-[17px]">분석 결과 보기</Text>
+                                </Button>
+
+                            </View>
+
+
+                                <Text className="text-gray90 text-[17px] font-semibold w-full text-left ml-4 mt-2">
+                                    {selectedDate ? (formatDateSimple(selectedDate.toISOString())) : '전체 일기'}
+                                </Text>
+
+                            </>}
                         contentContainerStyle={{ flexGrow: 1 }}
-                        contentContainerClassName="gap-y-4"
+                        contentContainerClassName="gap-y-2"
                         showsVerticalScrollIndicator={false}
                         scrollEnabled
                         ListEmptyComponent={
