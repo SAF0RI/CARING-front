@@ -12,14 +12,16 @@ import {
   useRootNavigationState,
   useSegments,
 } from "expo-router";
+import * as Updates from "expo-updates";
 import { useEffect, useMemo, useState } from "react";
-import { Alert } from "react-native";
+import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../index.css";
 
 export default function RootLayout() {
 
   useInAppUpdates();
+  const [isBootUpdating, setIsBootUpdating] = useState(true);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
@@ -65,6 +67,28 @@ export default function RootLayout() {
     []
   );
 
+  // 앱 초기 렌더 차단: 업데이트가 있으면 다운로드 후 즉시 재시작
+  useEffect(() => {
+    (async () => {
+      try {
+        if (
+          !Updates?.checkForUpdateAsync ||
+          !Updates?.fetchUpdateAsync ||
+          !Updates?.reloadAsync
+        )
+          return;
+        const res = await Updates.checkForUpdateAsync();
+        if (res?.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+          return;
+        }
+      } finally {
+        setIsBootUpdating(false);
+      }
+    })();
+  }, []);
+
   useEffect(() => {
     (async () => {
       try {
@@ -81,6 +105,29 @@ export default function RootLayout() {
     })();
   }, [queryClient]);
 
+  if (isBootUpdating)
+    return (
+      <SafeAreaProvider>
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 12,
+            paddingHorizontal: 24,
+          }}
+        >
+          <Image
+            source={require("../assets/images/img_logo_header.png")}
+            style={{ width: 120, height: 120, resizeMode: "contain" }}
+          />
+          <ActivityIndicator size="small" />
+          <Text style={{ fontSize: 14, color: "#666" }}>
+            자동 업데이트 확인중...
+          </Text>
+        </View>
+      </SafeAreaProvider>
+    );
   if (!navigationState?.key) return null;
   if (isLoadingUser) return null;
 

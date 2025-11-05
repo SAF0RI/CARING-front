@@ -131,7 +131,7 @@ export default function DiaryListScreen() {
                             innerClassName="flex-row items-center gap-x-2"
                             onPress={handleCalendarPress}
                         >
-                            <Text className="text-gray100 text-[15px] font-semibold">날짜 검색</Text>
+                            <Text className="text-gray100 text-[15px] font-semibold">날짜</Text>
                             <Icon name="CalendarIcon" size={24} />
                         </Button>
                     }
