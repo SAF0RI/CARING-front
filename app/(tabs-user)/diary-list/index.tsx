@@ -122,7 +122,7 @@ export default function DiaryListScreen() {
         <MainLayout>
             <MainLayout.Header>
                 <MainHeader
-                    title="일기 목록"
+                    title={selectedDate ? (formatDateSimple(selectedDate.toISOString())) : '일기 목록'}
                     rightComponent={
                         <Button
                             size="md"
@@ -161,7 +161,7 @@ export default function DiaryListScreen() {
                         ItemSeparatorComponent={() => <View className="h-5" />}
                         keyExtractor={(item) => item.voice_id.toString()}
                         ListHeaderComponent={() =>
-                            <><View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px]">
+                            <View className="w-full h-[172px] bg-main50 flex items-center justify-center rounded-b-[20px]">
                                 <Text className="text-gray90 text-[15px]">나를 더 알아가는 시간</Text>
                                 <Text className="text-xl font-bold">
                                     <Text className="text-main700">내 마음</Text>은 어땠을까요?
@@ -176,14 +176,7 @@ export default function DiaryListScreen() {
                                     <Text className="text-white font-bold text-[17px]">분석 결과 보기</Text>
                                 </Button>
 
-                            </View>
-
-
-                                <Text className="text-gray90 text-[17px] font-semibold w-full text-left ml-4 mt-2">
-                                    {selectedDate ? (formatDateSimple(selectedDate.toISOString())) : '전체 일기'}
-                                </Text>
-
-                            </>}
+                            </View>}
                         contentContainerStyle={{ flexGrow: 1 }}
                         contentContainerClassName="gap-y-2"
                         showsVerticalScrollIndicator={false}
