@@ -19,6 +19,18 @@ CI=1 npx expo prebuild -p android --clean
 echo "✓ Prebuild 완료"
 echo ""
 
+# 1-1. AndroidManifest.xml 수정 (Firebase 알림 색상 충돌 해결)
+echo "🔧 AndroidManifest.xml 수정 중..."
+MANIFEST_PATH="$PROJECT_ROOT/android/app/src/main/AndroidManifest.xml"
+if [ -f "$MANIFEST_PATH" ]; then
+    # tools:replace 속성 추가
+    sed -i '' 's|<meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/notification_icon_color"/>|<meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/notification_icon_color" tools:replace="android:resource"/>|g' "$MANIFEST_PATH"
+    echo "✓ AndroidManifest.xml 수정 완료"
+else
+    echo "⚠️  AndroidManifest.xml을 찾을 수 없습니다."
+fi
+echo ""
+
 # 2. Gradle 클린 빌드
 echo "🧹 Gradle 클린 빌드 실행 중..."
 cd "$PROJECT_ROOT/android"
