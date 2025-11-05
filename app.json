@@ -63,6 +63,14 @@
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",
       [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#ffffff",
+          "sounds": []
+        }
+      ],
+      [
         "expo-secure-store",
         {
           "configureAndroidBackup": true,

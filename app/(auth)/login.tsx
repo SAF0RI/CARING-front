@@ -2,13 +2,14 @@ import { queries } from "@/entities";
 import { signIn } from "@/entities/user/api";
 import { Role, UserInfo } from "@/entities/user/api/schema";
 import { setLocalUserInfo } from "@/entities/user/api/storage";
-import { registerFcmTokenToServer } from "@/shared/lib/fcm/token-management";
+import { registerFcmTokenToServer, retryPendingDeactivate } from "@/shared/lib/fcm/token-management";
 import { Button } from "@/shared/ui/buttons";
 import { LoginInput } from "@/shared/ui/input";
 import { Icon } from "@/shared/ui/svg";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,6 +19,22 @@ export default function LoginScreen() {
 
     const router = useRouter();
     const queryClient = useQueryClient();
+
+    // 컴포넌트 마운트 시 pending deactivate 요청 재시도
+    useEffect(() => {
+        (async () => {
+            try {
+                const result = await retryPendingDeactivate();
+                if (result.success) {
+                    console.log("Pending FCM 토큰 비활성화 재시도 성공");
+                } else {
+                    console.error("Pending FCM 토큰 비활성화 재시도 실패:", result.error);
+                }
+            } catch (error) {
+                console.error("Pending FCM 토큰 비활성화 재시도 중 오류:", error);
+            }
+        })();
+    }, []);
 
     const { control, handleSubmit, setValue, formState: { errors } } = useForm<{ username: string; password: string; role: Role }>({
         defaultValues: {

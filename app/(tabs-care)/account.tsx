@@ -5,7 +5,7 @@ import { Button, Icon, MainHeader, MainLayout } from "@/shared/ui";
 import { cn } from "@/shared/util/style";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Alert, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Text, View } from "react-native";
 
 export default function AccountScreen(
 
@@ -60,7 +60,7 @@ export default function AccountScreen(
                         await removeLocalUserInfo();
                         router.replace("/login");
                     }} size="md" variant="text" className="self-start mt-4">
-                        <Text className="text-gray50">로그아웃하기</Text>
+                        <Text className="text-gray50">로그아웃하기 <ActivityIndicator size="small" color="gray" /></Text>
                     </Button>
                 </View>
             </MainLayout.Content>

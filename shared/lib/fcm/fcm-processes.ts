@@ -1,5 +1,5 @@
 import { type ProcessResultMessage } from "@/shared/util/process";
-import messaging from "@react-native-firebase/messaging";
+import * as Notifications from "expo-notifications";
 
 export const requestUserPermissionProcess =
   async (): Promise<ProcessResultMessage> => {
@@ -8,13 +8,13 @@ export const requestUserPermissionProcess =
   };
 
 async function requestUserPermission(): Promise<boolean> {
-  const authStatus = await messaging().requestPermission();
-  const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
 
-  if (enabled) {
-    return true;
+  if (existingStatus !== "granted") {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
   }
-  return false;
+
+  return finalStatus === "granted";
 }
