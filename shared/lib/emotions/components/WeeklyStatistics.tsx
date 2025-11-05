@@ -38,6 +38,8 @@ export const WeeklyStatistics = ({
     data: weeklyData,
     isFetching,
     refetch,
+    isError,
+    error,
   } = useQuery<any>({
     ...(role === Role.CARE
       ? (queries.care.emotionWeeklySummary(username, monthString, week) as any)
@@ -88,9 +90,10 @@ export const WeeklyStatistics = ({
     });
   }
 
-  const weeklySummary = isFetching
+  const weeklySummary = isFetching || isError
     ? "주간 마음일기 통계를 불러오는 중입니다."
-    : weeklyData?.message || undefined;
+    : isError ? error?.message || "주간 마음일기 통계를 불러오는 중에 오류가 발생했습니다."
+      : weeklyData?.message || "주간 마음일기 통계를 불러오는 중에 오류가 발생했습니다.";
 
   const yAxisEmotions: Emotion[] = [
     "happy",

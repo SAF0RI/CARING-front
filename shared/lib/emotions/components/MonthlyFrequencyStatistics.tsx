@@ -24,7 +24,7 @@ export const MonthlyFrequencyStatistics = ({
 
   console.log({ username });
 
-  const { data: monthlyData, isFetching } = useQuery({
+  const { data: monthlyData, isFetching, isError, error } = useQuery({
     ...(role === Role.CARE
       ? queries.care.emotionMonthlyFrequency(username, monthString)
       : queries.user.monthlyFrequency(username, monthString)),
@@ -64,9 +64,10 @@ export const MonthlyFrequencyStatistics = ({
   const maxYAxis = Math.ceil(maxFrequency / 5) * 5; // 5단위로 올림
   const yAxisTicks = [0, 5, 10, 15, 20].filter((tick) => tick <= maxYAxis);
 
-  const monthlySummary = isFetching
+  const monthlySummary = isFetching || isError
     ? "감정 빈도 통계를 불러오는 중입니다."
-    : monthlyData?.message || undefined;
+    : isError ? error?.message || "감정 빈도 통계를 불러오는 중에 오류가 발생했습니다."
+      : monthlyData?.message || "감정 빈도 통계를 불러오는 중에 오류가 발생했습니다.";
 
   const emotionsForBar: Emotion[] = [
     "happy",
