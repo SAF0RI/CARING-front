@@ -11,7 +11,6 @@ import {
 import { queries } from "@/entities";
 import { VoiceListItem } from "@/entities/voices/api/schema";
 import { EmotionComponentWithText } from "@/shared/lib/emotions/components";
-import { formatDate } from "@/shared/util/format";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -35,6 +34,14 @@ type DiaryListCardProps = {
 
 const formatDateSimple = (date: Date) => {
   return `${date.getFullYear()}년 ${(date.getMonth() + 1).toString().padStart(2, "0")}월 ${date.getDate().toString().padStart(2, "0")}일`;
+};
+
+const formatDate = (isoString: string) => {
+  const date = new Date(isoString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}년 ${month}월 ${day}일`;
 };
 
 const DiaryListCard = ({
@@ -99,6 +106,8 @@ export default function DiaryListScreen() {
     ),
     enabled: !!userInfo?.username,
   });
+
+  console.log({ diaries: diaries?.voices });
 
   const { playAudio, isPlaying, isBuffering } = useAudioPlayer();
 

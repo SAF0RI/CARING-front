@@ -61,8 +61,9 @@ export const MonthlyFrequencyStatistics = ({
   };
 
   const maxFrequency = Math.max(...Object.values(frequencyData), 1);
-  const maxYAxis = Math.ceil(maxFrequency / 5) * 5; // 5단위로 올림
-  const yAxisTicks = [0, 5, 10, 15, 20].filter((tick) => tick <= maxYAxis);
+  const maxYAxis = Math.max(5, Math.ceil(maxFrequency / 5) * 5); // 최소 5, 5단위로 올림
+  const step = maxYAxis / 5; // 눈금 간격은 최고값을 5로 나눈 값
+  const yAxisTicks = Array.from({ length: 6 }, (_, i) => (i === 5 ? maxYAxis : Math.round(i * step)));
 
   const monthlySummary = isFetching || isError
     ? "감정 빈도 통계를 불러오는 중입니다."

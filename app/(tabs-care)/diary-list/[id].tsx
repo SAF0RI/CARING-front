@@ -24,8 +24,6 @@ export default function DiaryDetailScreen() {
 
   const { data: userInfo } = useQuery(queries.user.userInfo);
 
-  console.log({ userInfo });
-
   const {
     data: diary,
     refetch,
