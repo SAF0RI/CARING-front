@@ -1,6 +1,12 @@
 export const formatDate = (isoString: string) => {
+  // 서버에서 온 ISO 문자열의 날짜를 정확히 추출하기 위해 UTC 기준으로 파싱
+  // 예: "2024-01-15T15:00:00Z" -> "2024년 01월 15일" (UTC 기준 날짜)
   const date = new Date(isoString);
-  return `${date.getFullYear()}년 ${(date.getMonth() + 1).toString().padStart(2, "0")}월 ${date.getDate().toString().padStart(2, "0")}일`;
+  // UTC 기준으로 날짜 추출하여 시간대 영향 방지
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}년 ${month}월 ${day}일`;
 };
 
 export const formatDuration = (milliseconds: number) => {

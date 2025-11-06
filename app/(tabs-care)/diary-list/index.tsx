@@ -140,7 +140,7 @@ export default function DiaryListScreen() {
                         scrollEnabled
                         // 현재 선택 상태 표시 (null이면 전체)
                         ListHeaderComponent={() => <View className="pl-4 pb-2">
-                            <Text className="text-gray90 text-[19px] font-semibold">{selectedDate ? formatDate(selectedDate.toISOString()) : '전체 일기'}</Text>
+                            <Text className="text-gray90 text-[19px] font-semibold">{selectedDate ? `${selectedDate.getFullYear()}년 ${(selectedDate.getMonth() + 1).toString().padStart(2, "0")}월 ${selectedDate.getDate().toString().padStart(2, "0")}일` : '전체 일기'}</Text>
                         </View>}
                         ListEmptyComponent={
                             <View className="flex-1 justify-center items-center">

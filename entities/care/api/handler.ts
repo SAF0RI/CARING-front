@@ -20,7 +20,11 @@ export const getCareUserVoiceList = async (params: {
   const yyyyMMdd = (() => {
     if (!date) return "";
     if (typeof date === "string") return date; // expect 'YYYY-MM-DD'
-    return date.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+    // 로컬 날짜를 사용하여 시간대 영향 방지
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   })();
 
   const query = `care_username=${encodeURIComponent(care_username)}${yyyyMMdd ? `&date=${encodeURIComponent(yyyyMMdd)}` : ""}`;
