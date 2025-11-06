@@ -12,13 +12,10 @@ import { useLocalSearchParams } from "expo-router";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 
 const formatDateSimple = (isoString: string) => {
-  // 서버에서 온 ISO 문자열의 날짜를 정확히 추출하기 위해 UTC 기준으로 파싱
-  // 예: "2024-01-15T15:00:00Z" -> "2024.01.15" (UTC 기준 날짜)
   const date = new Date(isoString);
-  // UTC 기준으로 날짜 추출하여 시간대 영향 방지
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(date.getUTCDate()).padStart(2, "0");
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}.${month}.${day}`;
 };
 
@@ -44,15 +41,15 @@ export default function DiaryDetailScreen() {
 
   const emotionPercentages: Record<string, number> = currentDiary
     ? {
-        happy: currentDiary.happy_pct ?? 0,
-        neutral: currentDiary.neutral_pct ?? 0,
-        surprise: currentDiary.surprise_pct ?? 0,
-        sad: currentDiary.sad_pct ?? 0,
-        ...(currentDiary.anxiety_pct
-          ? { anxiety: currentDiary.anxiety_pct }
-          : { anxiety: currentDiary.fear_pct ?? 0 }),
-        angry: currentDiary.angry_pct ?? 0,
-      }
+      happy: currentDiary.happy_pct ?? 0,
+      neutral: currentDiary.neutral_pct ?? 0,
+      surprise: currentDiary.surprise_pct ?? 0,
+      sad: currentDiary.sad_pct ?? 0,
+      ...(currentDiary.anxiety_pct
+        ? { anxiety: currentDiary.anxiety_pct }
+        : { anxiety: currentDiary.fear_pct ?? 0 }),
+      angry: currentDiary.angry_pct ?? 0,
+    }
     : {};
 
   const emotionCharacteristics =
@@ -99,9 +96,9 @@ export default function DiaryDetailScreen() {
                 {diary?.username ?? "사용자"} 님이 {"\n"}
                 {
                   emotionKorMap[
-                    topEmotion === "fear"
-                      ? "anxiety"
-                      : (topEmotion ?? "unknown")
+                  topEmotion === "fear"
+                    ? "anxiety"
+                    : (topEmotion ?? "unknown")
                   ]
                 }{" "}
                 상태예요!

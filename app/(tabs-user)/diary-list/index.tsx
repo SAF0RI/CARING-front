@@ -34,7 +34,6 @@ type DiaryListCardProps = {
 };
 
 const formatDateSimple = (date: Date) => {
-  // 로컬 날짜를 직접 사용하여 시간대 영향 방지
   return `${date.getFullYear()}년 ${(date.getMonth() + 1).toString().padStart(2, "0")}월 ${date.getDate().toString().padStart(2, "0")}일`;
 };
 
@@ -88,6 +87,7 @@ export default function DiaryListScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+
   const {
     data: diaries,
     refetch,
@@ -128,7 +128,13 @@ export default function DiaryListScreen() {
       }
     }
     if (date) {
-      setSelectedDate(date);
+      const normalized = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      );
+      console.log({ normalized });
+      setSelectedDate(normalized);
       if (Platform.OS === "ios") {
         setShowDatePicker(false);
       }
@@ -166,7 +172,7 @@ export default function DiaryListScreen() {
               onPress={handleCalendarPress}
             >
               <Text className="text-gray100 text-[15px] font-semibold">
-                날짜
+                날짜 선택
               </Text>
               <Icon name="CalendarIcon" size={24} />
             </Button>

@@ -53,6 +53,7 @@ export default function DiaryListScreen() {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+
     const { data: diaries, refetch, isFetching } = useQuery({
         ...queries.care.careUserVoiceList(userInfo?.username ?? '', selectedDate ?? undefined),
         enabled: !!userInfo?.username,
@@ -72,7 +73,12 @@ export default function DiaryListScreen() {
             }
         }
         if (date) {
-            setSelectedDate(date);
+            const normalized = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate()
+            );
+            setSelectedDate(normalized);
             if (Platform.OS === 'ios') {
                 setShowDatePicker(false);
             }
