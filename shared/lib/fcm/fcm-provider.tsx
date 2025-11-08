@@ -2,7 +2,6 @@ import { ProcessManager } from '@/shared/util/process';
 import messaging from '@react-native-firebase/messaging';
 import { type EventSubscription } from 'expo-modules-core';
 import * as Notifications from 'expo-notifications';
-import * as SecureStore from 'expo-secure-store';
 import { useEffect, useMemo, useRef } from 'react';
 import { Platform } from 'react-native';
 import { requestUserPermissionProcess } from './fcm-processes';
@@ -59,9 +58,6 @@ export const FcmProvider = ({ children }: { children: React.ReactNode }) => {
         setupNotificationChannel();
 
         processManager.execute();
-        (async () => {
-            console.log(await SecureStore.getItemAsync("fcm-token"))
-        })();
 
         const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
 
