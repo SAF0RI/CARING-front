@@ -1,6 +1,5 @@
 import { Emotion } from "@/entities/voices/api/schema";
 export const normalizeEmotion = (raw?: string): Emotion | null => {
-  console.log({ raw });
   if (!raw) return null;
   const v = String(raw).trim().toLowerCase();
   // 영어

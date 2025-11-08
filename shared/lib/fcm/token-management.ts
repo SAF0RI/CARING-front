@@ -96,7 +96,6 @@ export const deactivateFcmTokenFromServer = async (
 ): Promise<{ success: boolean; error?: Error }> => {
   try {
     const { deactivateFcmToken } = await import("@/entities/fcm/api");
-    // 저장된 deviceId 사용 (등록 시 저장된 것)
     const deviceId = await getStoredDeviceId();
 
     await deactivateFcmToken({
@@ -104,12 +103,10 @@ export const deactivateFcmTokenFromServer = async (
       device_id: deviceId || null,
     });
 
-    // 성공 시 저장된 pending 정보 제거
     await AsyncStorage.removeItem(PENDING_DEACTIVATE_KEY);
 
     return { success: true };
   } catch (error) {
-    // 실패 시 AsyncStorage에 username 저장
     try {
       await AsyncStorage.setItem(PENDING_DEACTIVATE_KEY, username);
       console.log(
@@ -127,7 +124,6 @@ export const deactivateFcmTokenFromServer = async (
   }
 };
 
-// 저장된 pending deactivate 요청 가져오기
 export const getPendingDeactivateUsername = async (): Promise<
   string | null
 > => {
@@ -142,7 +138,6 @@ export const getPendingDeactivateUsername = async (): Promise<
   }
 };
 
-// 저장된 pending deactivate 요청 재시도
 export const retryPendingDeactivate = async (): Promise<{
   success: boolean;
   error?: Error;
@@ -150,7 +145,7 @@ export const retryPendingDeactivate = async (): Promise<{
   try {
     const username = await getPendingDeactivateUsername();
     if (!username) {
-      return { success: true }; // pending이 없으면 성공으로 처리
+      return { success: true };
     }
 
     const result = await deactivateFcmTokenFromServer(username);

@@ -21,14 +21,12 @@ export const uploadVoice = async ({
 }: UploadVoiceRequest): Promise<UploadVoiceResponse> => {
   const formData = new FormData();
 
-  // FormData에 파일 추가
   formData.append("file", {
     uri: file.uri,
     type: file.type,
     name: file.name,
   } as any);
 
-  // FormData에 username 추가
   formData.append("username", username);
 
   const response = await PostAxiosInstance<UploadVoiceResponse>(
@@ -69,28 +67,26 @@ export const uploadVoiceWithQuestion = async ({
   return response.data;
 };
 
-// GET /users/voices?username=...
 export const getUserVoiceList = async (
   username: string,
   date?: Date | string | null
 ): Promise<UserVoiceListResponse> => {
   const yyyyMMdd = (() => {
     if (!date) return "";
-    if (typeof date === "string") return date; // expect 'YYYY-MM-DD'
-    // 로컬 날짜를 사용하여 시간대 영향 방지
+    if (typeof date === "string") return date;
+
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   })();
-  console.log({ yyyyMMdd });
+
   const response = await GetAxiosInstance<UserVoiceListResponse>(
     `/users/voices?username=${encodeURIComponent(username)}${yyyyMMdd ? `&date=${encodeURIComponent(yyyyMMdd)}` : ""}`
   );
   return response.data;
 };
 
-// GET /users/voices/{voice_id}?username=...
 export const getUserVoiceDetail = async (
   voiceId: number,
   username: string
@@ -101,7 +97,6 @@ export const getUserVoiceDetail = async (
   return response.data;
 };
 
-// DELETE /users/voices/{voice_id}?username=...
 export const deleteUserVoice = async (
   voiceId: number,
   username: string

@@ -107,8 +107,6 @@ export default function DiaryListScreen() {
     enabled: !!userInfo?.username,
   });
 
-  console.log({ diaries: diaries?.voices });
-
   const { playAudio, isPlaying, isBuffering } = useAudioPlayer();
 
   const handleCardPress = async (diaryId: string) => {
@@ -142,7 +140,7 @@ export default function DiaryListScreen() {
         date.getMonth(),
         date.getDate()
       );
-      console.log({ normalized });
+
       setSelectedDate(normalized);
       if (Platform.OS === "ios") {
         setShowDatePicker(false);

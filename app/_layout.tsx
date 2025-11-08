@@ -13,10 +13,41 @@ import {
   useSegments,
 } from "expo-router";
 import * as Updates from "expo-updates";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Image, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "../index.css";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+    mutations: {
+      onMutate: (variables) => {
+        console.log("[RQ][Mutation][Request]", variables);
+      },
+      onSuccess: (data, variables) => {
+        console.log("[RQ][Mutation][Response]", { data, variables });
+      },
+      onError: (error, variables) => {
+        console.log(error, "error");
+        if (isAxiosError(error)) {
+          Alert.alert(
+            "오류",
+            error.response?.data?.message ??
+            "알 수 없는 오류가 발생했습니다."
+          );
+        } else {
+          Alert.alert(
+            "오류",
+            error.message ?? "알 수 없는 오류가 발생했습니다."
+          );
+        }
+      },
+    },
+  },
+});
 
 export default function RootLayout() {
 
@@ -30,44 +61,6 @@ export default function RootLayout() {
 
   const inAuthGroup = segments[0] === "(auth)";
 
-  // QueryClient를 메모이제이션하여 앱이 재시작될 때마다 새로 생성되지 않도록 함
-  const queryClient = useMemo(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            retry: false,
-          },
-          mutations: {
-            onMutate: (variables) => {
-              console.log("[RQ][Mutation][Request]", variables);
-            },
-            onSuccess: (data, variables) => {
-              console.log("[RQ][Mutation][Response]", { data, variables });
-            },
-            onError: (error, variables) => {
-              console.log(error, "error");
-              if (isAxiosError(error)) {
-                Alert.alert(
-                  "오류",
-                  error.response?.data?.message ??
-                  "알 수 없는 오류가 발생했습니다."
-                );
-              } else {
-                Alert.alert(
-                  "오류",
-                  error.message ?? "알 수 없는 오류가 발생했습니다."
-                );
-              }
-              //console.log("[RQ][Mutation][Error]", { error, variables });
-            },
-          },
-        },
-      }),
-    []
-  );
-
-  // 앱 초기 렌더 차단: 업데이트가 있으면 다운로드 후 즉시 재시작
   useEffect(() => {
     (async () => {
       try {
@@ -95,7 +88,6 @@ export default function RootLayout() {
         const info = await getLocalUserInfo();
         setUserInfo(info);
 
-        // 로드된 userInfo를 React Query 캐시에 초기 데이터로 설정
         if (info) {
           queryClient.setQueryData(queries.user.userInfo.queryKey, info);
         }
@@ -103,7 +95,7 @@ export default function RootLayout() {
         setIsLoadingUser(false);
       }
     })();
-  }, [queryClient]);
+  }, []);
 
   if (isBootUpdating)
     return (
@@ -135,7 +127,6 @@ export default function RootLayout() {
     return <Redirect href="/(auth)/login" />;
   }
   if (userInfo && inAuthGroup) {
-    // 역할에 따라 적절한 탭 그룹으로 리다이렉트
     if (userInfo.role === Role.CARE) {
       return <Redirect href="/(tabs-care)/home" />;
     }

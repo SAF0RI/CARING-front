@@ -20,7 +20,6 @@ export default function LoginScreen() {
     const router = useRouter();
     const queryClient = useQueryClient();
 
-
     // 컴포넌트 마운트 시 pending deactivate 요청 재시도
     useEffect(() => {
         (async () => {

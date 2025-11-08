@@ -22,8 +22,6 @@ export const MonthlyFrequencyStatistics = ({
   const [currentDate, setCurrentDate] = useState(new Date());
   const monthString = formatYearMonth(currentDate);
 
-  console.log({ username });
-
   const { data: monthlyData, isFetching, isError, error } = useQuery({
     ...(role === Role.CARE
       ? queries.care.emotionMonthlyFrequency(username, monthString)
@@ -32,8 +30,6 @@ export const MonthlyFrequencyStatistics = ({
     refetchOnReconnect: true,
     refetchOnMount: "always",
   });
-
-  console.log({ monthlyData });
 
   const handlePrevMonth = () => {
     const newDate = new Date(currentDate);
@@ -46,7 +42,6 @@ export const MonthlyFrequencyStatistics = ({
     newDate.setMonth(newDate.getMonth() + 1);
     setCurrentDate(newDate);
   };
-  console.log({ monthString });
 
   const frequency = monthlyData?.frequency || {};
 

@@ -32,9 +32,6 @@ export default function NotificationsScreen() {
         ...queries.care.notifications(userInfo?.data?.username ?? ''),
         enabled: !!userInfo?.data?.username,
     });
-    console.log({ notifications: notifications?.notifications.map((notification) => notification.top_emotion) });
-
-
 
     return (
         <MainLayout>
