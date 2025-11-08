@@ -13,39 +13,41 @@ cd "$PROJECT_ROOT"
 echo "🚀 Release APK 클린 빌드를 시작합니다..."
 echo ""
 
+# 채널/환경 변수 주입 (기본값: production)
+CHANNEL="${EXPO_UPDATES_CHANNEL:-}"
+if [ -z "$CHANNEL" ]; then
+  CHANNEL="production"
+fi
+export EXPO_UPDATES_CHANNEL="$CHANNEL"
+export NODE_ENV="production"
+echo "📡 EXPO_UPDATES_CHANNEL=$EXPO_UPDATES_CHANNEL"
+echo "🌡️ NODE_ENV=$NODE_ENV"
+
 # 1. Expo prebuild로 네이티브 코드 재생성
 echo "📦 Expo prebuild 실행 중..."
 CI=1 npx expo prebuild -p android --clean
 echo "✓ Prebuild 완료"
 echo ""
 
-# 1-1. AndroidManifest.xml 수정 (Firebase 알림 색상 충돌 해결)
-echo "🔧 AndroidManifest.xml 수정 중..."
-MANIFEST_PATH="$PROJECT_ROOT/android/app/src/main/AndroidManifest.xml"
-if [ -f "$MANIFEST_PATH" ]; then
-    # tools:replace 속성 추가
-    sed -i '' 's|<meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/notification_icon_color"/>|<meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/notification_icon_color" tools:replace="android:resource"/>|g' "$MANIFEST_PATH"
-    echo "✓ AndroidManifest.xml 수정 완료"
-else
-    echo "⚠️  AndroidManifest.xml을 찾을 수 없습니다."
-fi
-echo ""
-
 # 2. Gradle 클린 빌드
 echo "🧹 Gradle 클린 빌드 실행 중..."
 cd "$PROJECT_ROOT/android"
+export JAVA_TOOL_OPTIONS="-Xmx4g -XX:MaxMetaspaceSize=1024m"
+export LINT_HEAP_SIZE=4096m
 ./gradlew clean
 echo "✓ Clean 완료"
 echo ""
 
 # 3. Release APK 빌드
 echo "🔨 Release APK 빌드 중..."
+export JAVA_TOOL_OPTIONS="-Xmx4g -XX:MaxMetaspaceSize=1024m"
+export LINT_HEAP_SIZE=4096m
 ./gradlew assembleRelease
 echo "✓ 빌드 완료"
 echo ""
 
 # 4. APK 파일 확인
-APK_PATH="$PROJECT_ROOT/android/app/build/outputs/apk/release/app-release.apk"
+APK_PATH="/Users/junhyeokpark/Project/CARING-front/android/app/build/outputs/apk/release/app-release.apk"
 if [ -f "$APK_PATH" ]; then
     APK_SIZE=$(ls -lh "$APK_PATH" | awk '{print $5}')
     echo "✅ APK 빌드 성공!"

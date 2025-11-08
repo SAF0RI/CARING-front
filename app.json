@@ -1,12 +1,24 @@
 {
   "expo": {
     "name": "caring",
-    "slug": "caring",
+    "slug": "caromg",
     "version": "1.0.2",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "caring",
     "userInterfaceStyle": "automatic",
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/d7b08700-5cd4-48e9-92aa-b9405b612b7c",
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      }
+    },
     "androidStatusBar": {
       "backgroundColor": "#FFFFFF",
       "barStyle": "dark-content",
@@ -33,7 +45,11 @@
       "predictiveBackGestureEnabled": false,
       "usesCleartextTraffic": true,
       "package": "com.phobipark.caring",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "output": "static",
@@ -78,7 +94,30 @@
         }
       ],
       "expo-audio",
-      "./plugins/with-network-security-config"
+      "./plugins/with-network-security-config",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "2.1.20"
+          }
+        }
+      ],
+      [
+        "./plugins/with-fcm-notification-color",
+        {
+          "color": "#FFFFFF",
+          "resourceName": "notification_icon_color"
+        }
+      ],
+      [
+        "./plugins/with-gradle-props-tuning",
+        {
+          "orgGradleJvmargs": "-Xmx4096m -Xms1024m -XX:MaxMetaspaceSize=1024m -Dfile.encoding=UTF-8",
+          "kotlinDaemonJvmOptions": "-Xmx2048m,-Xms512m,-XX:MaxMetaspaceSize=1024m",
+          "channel": "production"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
@@ -87,8 +126,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "265077ca-4073-4fc9-a0e6-4473fd0b1185"
+        "projectId": "d7b08700-5cd4-48e9-92aa-b9405b612b7c"
       }
-    }
+    },
+    "owner": "ccaring"
   }
 }

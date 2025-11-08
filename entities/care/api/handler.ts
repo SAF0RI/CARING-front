@@ -19,10 +19,12 @@ export const getCareUserVoiceList = async (params: {
   const { care_username, date } = params;
   const yyyyMMdd = (() => {
     if (!date) return "";
-    if (typeof date === "string") return date; // expect 'YYYY-MM-DD'
-    return date.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+    if (typeof date === "string") return date;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   })();
-
   const query = `care_username=${encodeURIComponent(care_username)}${yyyyMMdd ? `&date=${encodeURIComponent(yyyyMMdd)}` : ""}`;
   const response = await GetAxiosInstance<CareUserVoiceListResponse>(
     `/care/users/voices?${query}`

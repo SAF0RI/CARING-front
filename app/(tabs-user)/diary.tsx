@@ -17,11 +17,10 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   RecordingPresets,
-  RecordingStatus,
   requestRecordingPermissionsAsync,
   setAudioModeAsync,
   useAudioRecorder,
-  useAudioRecorderState,
+  useAudioRecorderState
 } from "expo-audio";
 import { useEffect, useState } from "react";
 import {
@@ -51,12 +50,7 @@ export default function DiaryScreen() {
 
   const [currentBubbleText, setCurrentBubbleText] = useState(bubbleText.play);
 
-  const audioRecorder = useAudioRecorder(
-    RecordingPresets.HIGH_QUALITY,
-    (status: RecordingStatus) => {
-      console.log({ status });
-    }
-  );
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
 
   const recordingState = useAudioRecorderState(audioRecorder, 100);
 

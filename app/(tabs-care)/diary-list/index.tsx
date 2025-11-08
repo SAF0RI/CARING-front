@@ -4,7 +4,6 @@ import { queries } from "@/entities";
 import { CareVoiceListItem, TopEmotionResponse } from "@/entities/care/api/schema";
 import { emotionKorMap } from "@/shared/lib/emotions";
 import { EmotionIconComponent } from "@/shared/lib/emotions/components";
-import { formatDate } from "@/shared/util/format";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -16,6 +15,14 @@ type DiaryListCardProps = {
     topEmotion: TopEmotionResponse;
     onPress: () => void;
 }
+
+const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}년 ${month}월 ${day}일`;
+};
 
 const DiaryListCard = ({ diary, topEmotion }: DiaryListCardProps) => {
 
@@ -53,6 +60,7 @@ export default function DiaryListScreen() {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+
     const { data: diaries, refetch, isFetching } = useQuery({
         ...queries.care.careUserVoiceList(userInfo?.username ?? '', selectedDate ?? undefined),
         enabled: !!userInfo?.username,
@@ -72,7 +80,12 @@ export default function DiaryListScreen() {
             }
         }
         if (date) {
-            setSelectedDate(date);
+            const normalized = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate()
+            );
+            setSelectedDate(normalized);
             if (Platform.OS === 'ios') {
                 setShowDatePicker(false);
             }
@@ -140,7 +153,7 @@ export default function DiaryListScreen() {
                         scrollEnabled
                         // 현재 선택 상태 표시 (null이면 전체)
                         ListHeaderComponent={() => <View className="pl-4 pb-2">
-                            <Text className="text-gray90 text-[19px] font-semibold">{selectedDate ? formatDate(selectedDate.toISOString()) : '전체 일기'}</Text>
+                            <Text className="text-gray90 text-[19px] font-semibold">{selectedDate ? `${selectedDate.getFullYear()}년 ${(selectedDate.getMonth() + 1).toString().padStart(2, "0")}월 ${selectedDate.getDate().toString().padStart(2, "0")}일` : '전체 일기'}</Text>
                         </View>}
                         ListEmptyComponent={
                             <View className="flex-1 justify-center items-center">
